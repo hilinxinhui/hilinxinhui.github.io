@@ -1,0 +1,37 @@
+html {
+  font-size: 10px;
+  -webkit-text-size-adjust: 100%;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+a {
+  text-decoration: none;
+}
+body {
+  background-color: #f7f7f7;
+  font-family: "Rubik", "Lato", "PingFang SC", "Source Han Sans GB", "Noto Sans", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body .blog {
+  max-width: 1170px;
+  min-height: 100vh;
+  background-color: #fff;
+  margin: 0 auto;
+  border-top: 3px solid #9f353a;
+}
+body .blog .content {
+  box-sizing: border-box;
+  max-width: 770px;
+  width: 100%;
+  padding: 0px 20px 20px;
+  margin: 0 auto;
+}

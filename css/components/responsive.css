@@ -1,0 +1,18 @@
+@media (min-width: 768px) {
+  article {
+    padding: 8rem 0;
+  }
+}
+@media (max-width: 768px) {
+  .content {
+    padding-top: 0px !important;
+  }
+  article {
+    padding: 4.5rem 0 !important;
+  }
+}
+@media (max-width: 1380px) {
+  .toc-article {
+    display: none !important;
+  }
+}
