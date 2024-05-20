@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Do you really need ECC RAM with ZFS? | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="本文是Do you really need ECC RAM with ZFS?的翻译。
+在使用ZFS文件系统时，你是否真正需要ECC内存？">
+  
+
+  
+  
+  <meta name="keywords" content="TrueNAS,ECC内存">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Do you really need ECC RAM with ZFS?"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Do you really need ECC RAM with ZFS?</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/08/18/Do-you-really-need-ECC-RAM-with-ZFS/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-08-18T13:27:26.000Z">
+          2023-08-18
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2024-02-06-update"><span class="toc-text">2024.02.06 update</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tl-dr"><span class="toc-text">tl;dr</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81ECC%E5%86%85%E5%AD%98-aka-ECC%E5%86%85%E5%AD%98%E8%83%BD%E5%B8%A6%E6%9D%A5%E4%BB%80%E4%B9%88"><span class="toc-text">为什么需要ECC内存 aka ECC内存能带来什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E8%AE%BA"><span class="toc-text">结论</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本文是<a target="_blank" rel="noopener" href="https://ianhowson.com/zfs/ecc-ram/">Do you really need ECC RAM with ZFS?</a>的翻译。</p>
+<p>在使用ZFS文件系统时，你是否真正需要ECC内存？</p>
+<span id="more"></span>
+
+<h2 id="2024-02-06-update"><a href="#2024-02-06-update" class="headerlink" title="2024.02.06 update"></a>2024.02.06 update</h2><p>与其讨论诸如是否需要ECC内存和如何使用raid实现容灾等问题，增加数据副本和实施数据副本间同步才是真正重要的问题hhh。</p>
+<h2 id="tl-dr"><a href="#tl-dr" class="headerlink" title="tl;dr"></a>tl;dr</h2><p>简而言之，并非完全必要。然而，如果你选择使用，生活将更加美好。</p>
+<p>需要记住的是，ZFS绝对不会向你提供它认为是错误的数据。如果它检测到错误，它会给出一个错误提示，而绝不会提供错误的数据。所以如果你手上的非ECC内存已经能够正常工作了，通过升级ECC内存你将不会获得任何好处。</p>
+<h2 id="为什么需要ECC内存-aka-ECC内存能带来什么"><a href="#为什么需要ECC内存-aka-ECC内存能带来什么" class="headerlink" title="为什么需要ECC内存 aka ECC内存能带来什么"></a>为什么需要ECC内存 aka ECC内存能带来什么</h2><p>问题在于，不存在完美的硬件。现代硬盘的设计标准允许10的15次方分之一左右的比特错误率。尽管这个故障率看起来很小，但需要强调的是现代硬盘的容量（按比特计）正在接近这个数字，也就是，当用户的数据装满了一个硬盘时，数据错误可能已经存在了。</p>
+<p>大多数文件系统信任硬件提供的数据，并将这些数据直接传递给用户，数据中的问题会直接被暴露在用户眼前。当然，普通用户可能根本注意不带这些问题，毕竟现在大多数数据以高度压缩的视频、音频或图片等形式存在，微小的数据错误（如数据的某个比特上的数据翻转）对数据本身的影响微乎其微，用户对这种错误的宽容度很高。</p>
+<p>让ZFS难以与非ECC内存一起使用的关键是，ZFS不属于上述<em>大多数系统</em>，ZFS不信任直接来自硬件的数据，ZFS在将数据传递给用户之前会首先对数据进行校验，当数据存在错误时ZFS拒绝继续向上传递（有问题的）数据，而是给出一个错误信息。假设用户在ZFS卷上有一个20GB的虚拟机镜像，并且它出现了一个无法纠正的位错误，整个镜像会被标记为“损坏”，ZFS将不会将其提供给用户。仅仅因为一个位的错误，而这个错误很可能本来也不重要。</p>
+<p>当然，这里说的是<em>无法纠正</em>的错误。如果用户的数据完整地写入磁盘，且磁盘提供了相关机制保证数据正确性，那么这种错误几乎可以通过其他磁盘卷成员来纠正以保证提交给文件系统的数据的可靠性。</p>
+<p>真正的麻烦是数据在被写入磁盘时就出错了，<em>能够正常工作的非ECC</em>内存对这种错误没有检查和纠正的能力，于是错误的数据被写入存储池的各个镜像，冗余的数据也是错误的，这种情况下ZFS不会向用户提供这些数据，用户只能寄希望于另一个备份。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>为了让ZFS运行得更快更好而使用ECC内存是不现实的，ECC内存的真正作用是减少数据因为用户未知的微小的错误（这种微小的可能完全不影响使用的错误会因ZFS的“铁面无私”被放大，直到用户完全拿不到数据）而完全无法访问的可能性。</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/NAS/">NAS</a>, <a href="/categories/NAS/TrueNAS/">TrueNAS</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/TrueNAS/">TrueNAS</a><a href="/tags/ECC内存/">ECC内存</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

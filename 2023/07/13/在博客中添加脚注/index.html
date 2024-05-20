@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>在博客中添加脚注 | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="在Hexo博文中添加脚注需要两个条件， 分别是：
+
+支持脚注（当然还有更多拓展格式和功能，比如表格，比如更好地和HTML、LaTeX等格式互转。这里我们只关心脚注）的Mardown（Multi-Markdown， MMD）
+支持MMD的渲染器（Hexo插件）">
+  
+
+  
+  
+  <meta name="keywords" content="hexo,footnote">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="在博客中添加脚注"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>在博客中添加脚注</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/07/13/在博客中添加脚注/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-07-13T15:39:50.000Z">
+          2023-07-13
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#MMD"><span class="toc-text">MMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hexo%E6%8F%92%E4%BB%B6"><span class="toc-text">Hexo插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Markdown2WebPage"><span class="toc-text">Markdown2WebPage</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>在Hexo博文中添加脚注需要两个条件， 分别是：</p>
+<ul>
+<li>支持脚注（当然还有更多拓展格式和功能，比如表格，比如更好地和HTML、LaTeX等格式互转。这里我们只关心脚注）的Mardown（Multi-Markdown， MMD）</li>
+<li>支持MMD的渲染器（Hexo插件）</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="MMD"><a href="#MMD" class="headerlink" title="MMD"></a>MMD</h2><p>本文无意考证Markdown的“语言标准”，止<em>天不生我MMD，Markdown（指基本语法）脚注万古如长夜</em>尔。截止至本文写作时，MMD已经更新至版本<code>6.7.0</code>，详见<a target="_blank" rel="noopener" href="https://github.com/fletcher/MultiMarkdown-6">MMD_GitHub_Page</a>。</p>
+<p>脚注包括两个部分，第一部分写在正文里，是所有脚注内容的索引；第二部分一般写在文末，是具体地脚注内容，这些内容构成了脚注全体。有了MMD，索引部分在正文中插入<code>[^&#123;footnote_tag&#125;]</code>即可，具体脚注内容写法看起来像这样：<code>[^footnote_tag]: 这是一条插入的脚注，作者用的插件使得代码框内的脚注也生效</code>。渲染之后看起来像这样：</p>
+<p>插入一条脚注<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="这是一条插入的脚注
+">[1]</span></a></sup>。</p>
+<p>当然这里的脚注效果在MMD的基础上增加了悬停显示（鼠标放置在超链接区域时显示脚注内容）和点击跳转（双向跳转）的功能，这些功能是hexo插件提供的，具体<a href="#hexo%E6%8F%92%E4%BB%B6">见下</a>。</p>
+<h2 id="Hexo插件"><a href="#Hexo插件" class="headerlink" title="Hexo插件"></a>Hexo插件</h2><p>Hexo默认Markdown渲染器不支持脚注语法，需要安装插件，这里以<code>hexo-reference</code><sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/kchen0x/hexo-reference
+">[2]</span></a></sup>为例。</p>
+<p>安装<code>hexo-reference</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-reference --save</span></span><br></pre></td></tr></table></figure>
+
+<p>并在<code>_config.yml</code>中<code>plugins</code>字段下加入<code>hexo-reference</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">plugins:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">hexo-reference</span></span><br></pre></td></tr></table></figure>
+
+<p>除此之外，</p>
+<ul>
+<li><code>hexo-reference-plus</code><sup id="fnref:3"><a href="#fn:3" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/maxchang3/hexo-reference-plus
+">[3]</span></a></sup></li>
+<li><code>hexo-renderer-markdown-it</code><sup id="fnref:4"><a href="#fn:4" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/hexojs/hexo-renderer-markdown-it">[4]</span></a></sup></li>
+</ul>
+<p>等插件也可以实现类似的功能。</p>
+<p><code>hexo-reference</code>插件还有一点小bug，包括：</p>
+<ul>
+<li>在<strong>某些情况下</strong>Markdown标题不能渲染（<code>hexo-reference-plus</code>也有同样的问题）</li>
+<li>代码块中的脚注代码也会被渲染（Markdown又没有足够的转义符规则，<code>只能使用行内代码</code>回避这一问题）</li>
+<li><strong>似乎</strong>代码块必须指定语言，否则代码块之后的内容无法正确渲染</li>
+<li>脚注索引<strong>似乎</strong>不不支持脚注名（或许是我姿势不对）</li>
+<li>脚注编号（页尾）上移，不知道是不是作者有意为之</li>
+</ul>
+<h2 id="Markdown2WebPage"><a href="#Markdown2WebPage" class="headerlink" title="Markdown2WebPage"></a>Markdown2WebPage</h2><p>用别人的框架果然还是麻烦，更想写自己的静态页面生成器了doge。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">这是一条插入的脚注<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/kchen0x/hexo-reference<a href="#fnref:2" rev="footnote"> ↩</a></span></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">3.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/maxchang3/hexo-reference-plus<a href="#fnref:3" rev="footnote"> ↩</a></span></li><li id="fn:4"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">4.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/hexojs/hexo-renderer-markdown-it<a href="#fnref:4" rev="footnote"> ↩</a></span></li></ol></div></div>
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/Dev/">Dev</a>, <a href="/categories/Dev/Web/">Web</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/hexo/">hexo</a><a href="/tags/footnote/">footnote</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

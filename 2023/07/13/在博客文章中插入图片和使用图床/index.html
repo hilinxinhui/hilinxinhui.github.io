@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>在博客文章中插入图片和使用图床 | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="本文第一部分介绍在Hexo中增加资源目录并在博文中插入图片的方法。显然这种方法只适合于Hexo，所以本文第二部分介绍通过图床（在理论上任何地方）插入图片的方法。
+什么是图床？不严格地解释，图床就是存放图片的服务器，将图片上传到某个图床服务商的服务器，获取可访问（可公网访问？不知道这样的描述对不对）的图片url的过程就是使用图床的过程。搭建图床的过程十分简单，理论上一台可公网访问的服务器即可。本文第二部分介绍介绍以GitHub（服务器）作为图床服务器的方法，配合PicGo搭建图床。PicGo用户指南请看这里。">
+  
+
+  
+  
+  <meta name="keywords" content="hexo,GitHub,image_host">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="在博客文章中插入图片和使用图床"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>在博客文章中插入图片和使用图床</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/07/13/在博客文章中插入图片和使用图床/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-07-13T14:40:15.000Z">
+          2023-07-13
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8Hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87"><span class="toc-text">在Hexo博客中插入图片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A"><span class="toc-text">搭建图床</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%BA%8A%E6%B5%8B%E8%AF%95"><span class="toc-text">图床测试</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本文第一部分介绍在Hexo中增加资源目录并在博文中插入图片的方法。显然这种方法只适合于Hexo，所以本文第二部分介绍通过图床（在理论上任何地方）插入图片的方法。</p>
+<p>什么是图床？不严格地解释，图床就是存放图片的服务器，将图片上传到某个图床服务商的服务器，获取可访问（可公网访问？不知道这样的描述对不对）的图片url的过程就是使用图床的过程。搭建图床的过程十分简单，理论上一台可公网访问的服务器即可。本文第二部分介绍介绍以GitHub（服务器）作为图床服务器的方法，配合<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo">PicGo</a>搭建图床。PicGo用户指南请看<a target="_blank" rel="noopener" href="https://picgo.github.io/PicGo-Doc/zh/guide/">这里</a>。</p>
+<span id="more"></span>
+
+<h2 id="在Hexo博客中插入图片"><a href="#在Hexo博客中插入图片" class="headerlink" title="在Hexo博客中插入图片"></a>在Hexo博客中插入图片</h2><p>第一种情形&#x2F;方法，诸如<code>about</code>页面中的图片，在<code>source</code>目录下新建<code>image</code>目录（其实起什么名字都行）存要插入的图片，在对应页面（在这里的例子里是<code>about.html</code>）中通过相对路径插入图片即可。</p>
+<p>第二种情形&#x2F;方法，一般的<code>post</code>博文中的图片，修改<code>_config.yml</code>文件中<code>post_asset_folder</code>字段为<code>true</code>，以后新建博文（指markdown文件）时会自动生成名字同名目录用于存放需要插入的图片资源文件，将要插入的图片保存在对应目录下，在博文markdown文件中引用对应图片即可，注意以下两个小问题：</p>
+<ul>
+<li>安装<code>hexo-renderer-marked</code>插件，否则只能以<code>&#123;%asset_image <image_name> <description> %&#125;</code>的形式插入图片</li>
+<li>引用图片时只需要包含图片名称，图片资源文件的url是由上一条注意事项中的插件自动生成的</li>
+<li>对在进行上述设置前新建的博客文件，手动创建同名资源文件夹即可</li>
+</ul>
+<h2 id="搭建图床"><a href="#搭建图床" class="headerlink" title="搭建图床"></a>搭建图床</h2><ul>
+<li>注册GitHub账号</li>
+<li>新建图床仓库（设置为<code>Public</code>）</li>
+<li>生成token(用<code>Tokens(classic)</code>，勾选<code>repo</code>权限即可)</li>
+<li>安装PicGo客户端，填入各种信息</li>
+<li>上传图片</li>
+<li><a href="#%E5%9B%BE%E5%BA%8A%E6%B5%8B%E8%AF%95">使用图床</a></li>
+</ul>
+<h2 id="图床测试"><a href="#图床测试" class="headerlink" title="图床测试"></a>图床测试</h2><p>如图是PicGo的GitHub设置示意图，填写：</p>
+<ul>
+<li>图床仓库名</li>
+<li>上传到图床仓库的哪一个分支</li>
+<li>token</li>
+<li>存储路径和自定义域名（非必须，我设置了存储路径）</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/hilinxinhui/image_host_github/main/images/picgo_github_setting.png" alt="PicGoGitHub设置示意"></p>
+<p>和直接上传图片没有很大区别。</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/Dev/">Dev</a>, <a href="/categories/Dev/Web/">Web</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/hexo/">hexo</a><a href="/tags/GitHub/">GitHub</a><a href="/tags/image-host/">image_host</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

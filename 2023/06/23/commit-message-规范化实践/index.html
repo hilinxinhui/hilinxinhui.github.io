@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>commit message 规范化实践 | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="Commitizen和git commit message规范化实践。
+按照惯例这里有一篇与git相关的文章。git的提交信息很重要，尤其在多人协作开发大型软件的场景下。本文介绍完整的git commit message应该包括哪些信息，以及如何省心省力地书写这些信息。">
+  
+
+  
+  
+  <meta name="keywords" content="git,Commitizen">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="commit message 规范化实践"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>commit message 规范化实践</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/06/23/commit-message-规范化实践/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-06-23T08:21:06.000Z">
+          2023-06-23
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#git-commit-message"><span class="toc-text">git commit message</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AngularJS-Git-Commit-Message-Conventions"><span class="toc-text">AngularJS Git Commit Message Conventions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Commitizen"><span class="toc-text">Commitizen</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E6%96%87%E5%8F%82%E8%80%83%E4%BA%86%E4%BB%A5%E4%B8%8B%E5%86%85%E5%AE%B9"><span class="toc-text">本文参考了以下内容</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>Commitizen和git commit message规范化实践。</p>
+<p>按照惯例这里有一篇与git相关的文章。git的提交信息很重要，尤其在多人协作开发大型软件的场景下。本文介绍完整的git commit message应该包括哪些信息，以及如何省心省力地书写这些信息。</p>
+<span id="more"></span>
+
+<h2 id="git-commit-message"><a href="#git-commit-message" class="headerlink" title="git commit message"></a>git commit message</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">一行commit message足矣</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git commit -m <span class="string">&quot;&lt;commit message&gt;&quot;</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果需要写多行commit message</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git commit <span class="comment"># 进入文本编辑器写更详细的提交信息</span></span></span><br></pre></td></tr></table></figure>
+
+<p>commit message的写法就像变量的命名方法，应力求简洁准确，清晰明了。具体的commit message格式有不同标准，这里采用<a target="_blank" rel="noopener" href="https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.greljkmo14y0">Angular规范</a></p>
+<p>一种简单淳朴的方式是手工创建一个纯文本文件<code>.git_commit_message_template</code>，在这个文件中填写希望每次提交时需要提供的信息，修改<code>~/.gitconfig</code>文件，在其中加上：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[commit]</span><br><span class="line">template = ~/.git_commit_message_template</span><br></pre></td></tr></table></figure>
+
+<p>这样每次使用<code>git commit</code>唤起文本编辑器时，<code>.git_commit_message_template</code>中的内容会以注释的形式出现在编辑器中作为hints。</p>
+<p>这样的方式或许过于简单淳朴，十分懒人不友好。幸运的是，可以通过<a target="_blank" rel="noopener" href="https://github.com/commitizen/cz-cli">Commitizen</a>工具实现一定程度的自动化。</p>
+<h2 id="AngularJS-Git-Commit-Message-Conventions"><a href="#AngularJS-Git-Commit-Message-Conventions" class="headerlink" title="AngularJS Git Commit Message Conventions"></a>AngularJS Git Commit Message Conventions</h2><p>Angular规范规定的commit message包括三个部分：</p>
+<ul>
+<li>Header：说明提交类别、提交的影响范围和提交的目的</li>
+<li>Body：对本次提交的详细描述</li>
+<li>Footer：产生不兼容变动或关闭issue时写</li>
+</ul>
+<p>具体写法可参考<a target="_blank" rel="noopener" href="https://ruanyifeng.com/blog/2016/01/commit_message_change_log.html">这里</a>。</p>
+<h2 id="Commitizen"><a href="#Commitizen" class="headerlink" title="Commitizen"></a>Commitizen</h2><p>安装Commitizen需要<code>npm</code>，作者推荐使用<code>nvm</code>管理node版本。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install -g commitizen</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">切换到项目目录下</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">commitizen init cz-conventional-changelog --save --save-exact</span></span><br></pre></td></tr></table></figure>
+
+<p>注意安装好后可能要修改<code>.gitignore</code>文件。</p>
+<p>此后提交操作的命令由<code>git commit</code>变为<code>git cz</code>。</p>
+<h2 id="本文参考了以下内容"><a href="#本文参考了以下内容" class="headerlink" title="本文参考了以下内容"></a>本文参考了以下内容</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21209619/answer/257574960">如何写好 Git commit log?</a></li>
+<li><a target="_blank" rel="noopener" href="https://ruanyifeng.com/blog/2016/01/commit_message_change_log.html">Commit message 和 Change log 编写指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://commitizen-tools.github.io/commitizen/">Commitizen</a></li>
+</ul>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/Dev/">Dev</a>, <a href="/categories/Dev/VCS/">VCS</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/git/">git</a><a href="/tags/Commitizen/">Commitizen</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

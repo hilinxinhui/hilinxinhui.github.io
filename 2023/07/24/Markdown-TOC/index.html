@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Markdown TOC | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="Standard-README要求一个标准的README文件（maximal version）应当包含目录（Table of Contents，TOC），本文介绍一个能够实现Markdown文档TOC生成的方便的插件，Markdown Preview Enhanced。">
+  
+
+  
+  
+  <meta name="keywords" content="Markdown,table_of_contents,GitHub">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Markdown TOC"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Markdown TOC</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/07/24/Markdown-TOC/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-07-24T07:21:43.000Z">
+          2023-07-24
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#MPE"><span class="toc-text">MPE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Generate-TOC-using-MPE"><span class="toc-text">Generate TOC using MPE</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><a target="_blank" rel="noopener" href="https://github.com/RichardLitt/standard-readme">Standard-README</a>要求一个标准的README文件（maximal version）应当包含目录（Table of Contents，TOC），本文介绍一个能够实现Markdown文档TOC生成的方便的插件，<a target="_blank" rel="noopener" href="https://github.com/shd101wyy/markdown-preview-enhanced">Markdown Preview Enhanced</a>。</p>
+<span id="more"></span>
+
+<h2 id="MPE"><a href="#MPE" class="headerlink" title="MPE"></a>MPE</h2><p>MPE是一个服务Markdown文件的插件，目前支持VScode和Atom：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/shd101wyy/markdown-preview-enhanced">这里</a>是它的GitHub仓库地址</li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced">这里</a>是它在VScode插件商店中的地址</li>
+</ul>
+<p>MPE能实现各种各样的与Markdown格式相关的操作，这里只讨论插入目录这一个功能。当然反过来说能实现向Markdown文档中插入目录功能的插件&#x2F;脚本不止这一个，类似的产品包括<a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one">Markdown All in One</a>和<a target="_blank" rel="noopener" href="https://github.com/jonschlinkert/markdown-toc">markdown-toc</a>等，选择MPE是因为它更简单的操作和更完善的文档。</p>
+<h2 id="Generate-TOC-using-MPE"><a href="#Generate-TOC-using-MPE" class="headerlink" title="Generate TOC using MPE"></a>Generate TOC using MPE</h2><p>作者通常使用的文本编辑器是VScode，通过MPE在Markdown文档中插入TOC，可以直接在VScode集成的插件商店中搜索安装MPE。</p>
+<p>安装完成后设置通过MDP预览Markdown文档，注意这一步是必须的。</p>
+<p>要在Markdown文档中插入TOC，首先在文档要插入目录的位置添加以下内容：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- @import &quot;[TOC]&quot; &#123;cmd=&quot;toc&quot; depthFrom=1 depthTo=6 orderedList=false&#125; --&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述代码不需要手动输入，按下<code>Ctrl</code> + <code>Shift</code> + <code>P</code>唤出panel后输入<code>create TOC</code>即可：</p>
+<p><img src="/2023/07/24/Markdown-TOC/vscode_panel.png" alt="vscode_panel"></p>
+<p>打开预览（<code>Ctrl</code> + <code>K</code> <code>V</code>）后保存（<code>Ctrl</code> + <code>S</code>），即可生成TOC。显然TOC依据Markdown文档中的标题生成，修改上面插入内容中的<code>depthFrom</code>和<code>depthTo</code>字段可以设置抓取的标题级别；对于不想被抓取生成TOC的标题，在其后添加<code>&#123;ignore=true&#125;</code>标签即可，注意此标签不会被GitHub的Markdown渲染器忽略，生成TOC后记得删除此标签。</p>
+<p>更多标签设置请参考<a target="_blank" rel="noopener" href="https://shd101wyy.github.io/markdown-preview-enhanced/#/zh-cn/toc">此文档</a>。</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/Dev/">Dev</a>, <a href="/categories/Dev/Docs/">Docs</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/Markdown/">Markdown</a><a href="/tags/table-of-contents/">table_of_contents</a><a href="/tags/GitHub/">GitHub</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

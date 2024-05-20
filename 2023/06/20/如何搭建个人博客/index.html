@@ -1,0 +1,252 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>如何搭建个人博客 | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="使用Hexo、GitHub Pages和GitHub Actions搭建个人博客。
+
+Hexo是一个快速、简洁且高效的博客框架。Hexo 使用Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。GitHub Pages是一个静态站点托管服务，旨在直接从GitHub仓库中直接托管个人、组织或项目页面。GitHub Actions是一种持续集成和持续交付 (CI&amp;#x2F;CD) 平台，可用于自动执行生成、测试和部署管道。用户可以创建工作流程来构建和测试存储库的每个拉取请求，或将合并的拉取请求部署到生产环境。">
+  
+
+  
+  
+  <meta name="keywords" content="hexo,git,CI/CD">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="如何搭建个人博客"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>如何搭建个人博客</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/06/20/如何搭建个人博客/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-06-20T08:18:36.000Z">
+          2023-06-20
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hexo"><span class="toc-text">Hexo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-Pages"><span class="toc-text">GitHub Pages</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E4%BB%93%E5%BA%93%EF%BC%8C%E9%85%8D%E7%BD%AESSH-key"><span class="toc-text">建仓库，配置SSH key</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B9%E9%85%8D%E7%BD%AE"><span class="toc-text">改配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2"><span class="toc-text">一键部署</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-Actions"><span class="toc-text">GitHub Actions</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%AF%86%E9%92%A5"><span class="toc-text">配置密钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-text">创建工作流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E9%80%81%E5%92%8C%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2"><span class="toc-text">推送和自动部署</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-text">其他</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E9%A2%98%E5%92%8C%E7%BE%8E%E5%8C%96"><span class="toc-text">主题和美化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A6%96%E9%A1%B5%E6%8A%98%E5%8F%A0%E5%86%85%E5%AE%B9"><span class="toc-text">首页折叠内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD%E2%80%A6"><span class="toc-text">未完待续…</span></a></li></ol></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>使用Hexo、GitHub Pages和GitHub Actions搭建个人博客。</p>
+<blockquote>
+<p>Hexo是一个快速、简洁且高效的博客框架。Hexo 使用Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。GitHub Pages是一个静态站点托管服务，旨在直接从GitHub仓库中直接托管个人、组织或项目页面。GitHub Actions是一种持续集成和持续交付 (CI&#x2F;CD) 平台，可用于自动执行生成、测试和部署管道。用户可以创建工作流程来构建和测试存储库的每个拉取请求，或将合并的拉取请求部署到生产环境。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>是一个<strong>开源</strong>（源码地址见<a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo">Hexo on GitHub</a>）的“快速、简洁且高效的博客框架”。</p>
+<p>Hexo基于node.js，安装Hexo需要使用npm。作者建议使用nvm管理node环境以避免不必要的麻烦。对于Linux或MacOS用户，可以<a target="_blank" rel="noopener" href="https://github.com/nvm-sh/nvm">这样</a>安装nvm；Windows用户请移步<a target="_blank" rel="noopener" href="https://github.com/coreybutler/nvm-windows">nvm for Windows</a>（当然也可以借助wsl或docker）。</p>
+<p>安装的过程<strong>看起来像这样</strong>（仅作示范）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">从安装nvm说起？</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash <span class="comment"># 或者用wget，无法访问raw.githubusercontent.com可以换gitee上的这个：https://gitee.com/RubyKids/nvm-cn（但是作者并不知道是否能保持更新）</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">你可能需要重启终端或者<span class="built_in">source</span>点什么东西</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">nvm install --lts <span class="comment"># 此时的lts指向18.06.0</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Windows下需要手动指定使用的node版本，其他平台貌似不需要，至此已经准备好node和npm了</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">假设博文内容存放在blog_hexo目录下</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">mkdir</span> blog_hexo &amp;&amp; <span class="built_in">cd</span> blog_hexo</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-cli -g</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo init ./</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">差不多完成了，看看效果</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo g <span class="comment"># generate</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo s <span class="comment"># server，访问https://localhost:4000即可看到效果</span></span></span><br></pre></td></tr></table></figure>
+
+<p>现在的网站非常简陋，更重要的是，网站的所有信息（包括标题、子标题、作者）都没有设置。这时候需要修改<code>blog_hexi/_config.yml</code>中的对应值，具体字段的含义请看<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/configuration">这里</a>。</p>
+<p>现在我们可以开始专注于写作了，博客内容以Markdown文件的形式呈现，写一篇博客的过程<strong>看起来像这样</strong>（仅作示范*2），具体指令的含义请看<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/writing">这里</a>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo clean <span class="comment"># 清除缓存文件和已生成的静态文件</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo new <span class="string">&quot;如何搭建个人博客&quot;</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">working really hard on writing...</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo g <span class="comment"># hexo generate</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo s <span class="comment"># hexo server，访问https://localhost:4000检查一下效果</span></span></span><br></pre></td></tr></table></figure>
+
+<p>或许你想和用git管理<code>blog_hexo</code>目录，请注意先执行<code>hexo init ./</code>，再执行<code>git init ./</code>；若要把这个仓库同步到诸如GitHub或Gitee这样的git服务器上，注意设置仓库的可访问性以避免token&#x2F;SSH key等内容泄露。</p>
+<p>Hexo的<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">文档</a>非常详细，可读性也很好，要更进一步地了解Hexo可以先从文档看起。</p>
+<h2 id="GitHub-Pages"><a href="#GitHub-Pages" class="headerlink" title="GitHub Pages"></a>GitHub Pages</h2><p>作者两年前买了一个.com域名，现在快续不起费了qaq，还是先用<a href="hilinxinhui.github.io">GitHub Pages</a>。</p>
+<p>hexo官方的关于部署过程的<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/github-pages">文档</a>杂糅了GitHub Pages和GitHub Actions的操作，参考这个一键部署<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/one-command-deployment">文档</a>更合适一些。</p>
+<p>在使用GitHub Pages之前，显然要先知道什么是git和什么是GitHub，这两部分内容都不是本文的重点，如有需要请参考<a target="_blank" rel="noopener" href="https://github.com/hilinxinhui/AMazeLab_git_tutorial">这个文档</a>。使用GitHub Pages和Hexo部署个人博客的过程分为三步：</p>
+<h3 id="建仓库，配置SSH-key"><a href="#建仓库，配置SSH-key" class="headerlink" title="建仓库，配置SSH key"></a>建仓库，配置SSH key</h3><p>仓库名为<code>&lt;username&gt;.github.io</code>。</p>
+<p>配置SSH key，将公钥保存到GitHub上，如有需要请参考<a target="_blank" rel="noopener" href="https://git-scm.com/book/zh/v2/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-Git-%E7%94%9F%E6%88%90-SSH-%E5%85%AC%E9%92%A5">这里</a>。</p>
+<h3 id="改配置"><a href="#改配置" class="headerlink" title="改配置"></a>改配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> blog_hexo</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-deployer-git --save</span></span><br></pre></td></tr></table></figure>
+
+<p>修改<code>blog_hexo/_config.yml</code>文件，看起来像这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">## Docs: https://hexo.io/docs/one-command-deployment</span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repository: git@github.com:hilinxinhui/hilinxinhui.github.io.git</span><br><span class="line">  branch: main</span><br></pre></td></tr></table></figure>
+
+<h3 id="一键部署"><a href="#一键部署" class="headerlink" title="一键部署"></a>一键部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo d <span class="comment"># hexo deploy</span></span></span><br></pre></td></tr></table></figure>
+
+<p>具体实现方式见<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/one-command-deployment">文档</a>。</p>
+<h2 id="GitHub-Actions"><a href="#GitHub-Actions" class="headerlink" title="GitHub Actions"></a>GitHub Actions</h2><p>这一步或许不是必须的，尤其当你不使用git管理博客内容的时候（更准确地说是不管理blog_hexo这个目录时）。</p>
+<p>GitHub Actions实现了以下工作流：</p>
+<ul>
+<li>在<code>blog_hexo</code>目录下完成写博客</li>
+<li>git add &amp; git commit &amp; git push</li>
+<li>自动完成站点部署</li>
+</ul>
+<p>使用GitHub Actions部署站点，理论上本地不再需要安装node、hexo等环境。使用GitHub Actions部署站点，GitHub上有两个仓库，一个是<code>blog_hexo</code>仓库，设置为<code>Private</code>（避免泄露各种密钥），一个是<code>&lt;username&gt;.github.io</code>，显然设置为<code>Public</code>（这样才能正常访问站点）。配置GitHub Actions还是分三步：</p>
+<h3 id="配置密钥"><a href="#配置密钥" class="headerlink" title="配置密钥"></a>配置密钥</h3><p>生成SSH key，和上文已经描述过的过程一样。</p>
+<p><code>&lt;username&gt;.github.io</code>仓库下<code>Settings</code>中<code>Deploy keys</code>保存公钥。</p>
+<p><code>blog_hexo</code>仓库下<code>Settings</code>中<code>Secrets and variables</code>下<code>Actions</code>保存私钥。</p>
+<p>请记住这里公钥和私钥的名字，配置文件中要用到。</p>
+<h3 id="创建工作流"><a href="#创建工作流" class="headerlink" title="创建工作流"></a>创建工作流</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> blog_hexo/.github <span class="comment"># 没有.github目录请自行新建</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">mkdir</span> workflows &amp;&amp; <span class="built_in">cd</span> workflows</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">touch</span> auto_deploy.yml <span class="comment"># 文件名可自定</span></span></span><br></pre></td></tr></table></figure>
+
+<p>修改<code>auto_deploy.yml</code>的内容定义GitHub Actions工作流，以下给出作者的配置，供参考：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">name: Hexo Deploy</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - main</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  build:</span><br><span class="line">    runs-on: ubuntu-20.04</span><br><span class="line">    if: github.event.repository.owner.id == github.event.sender.id</span><br><span class="line"></span><br><span class="line">    steps:</span><br><span class="line">      - name: Checkout source</span><br><span class="line">        uses: actions/checkout@v2</span><br><span class="line">        with:</span><br><span class="line">          ref: main</span><br><span class="line"></span><br><span class="line">      - name: Setup Node.js</span><br><span class="line">        uses: actions/setup-node@v1</span><br><span class="line">        with:</span><br><span class="line">          node-version: &#x27;18&#x27;</span><br><span class="line"></span><br><span class="line">      - name: Setup Hexo</span><br><span class="line">        env:</span><br><span class="line">          ACTION_DEPLOY_KEY: $&#123;&#123; secrets.HEXO_DEPLOY_KEY &#125;&#125;</span><br><span class="line">        run: |</span><br><span class="line">          mkdir -p ~/.ssh/</span><br><span class="line">          echo &quot;$ACTION_DEPLOY_KEY&quot; &gt; ~/.ssh/id_rsa</span><br><span class="line">          chmod 700 ~/.ssh</span><br><span class="line">          chmod 600 ~/.ssh/id_rsa</span><br><span class="line">          ssh-keyscan github.com &gt;&gt; ~/.ssh/known_hosts</span><br><span class="line">          git config --global user.email &quot;hilinxinhui@gmail.com&quot;</span><br><span class="line">          git config --global user.name &quot;hilinxinhui&quot;</span><br><span class="line">          git config --global init.defaultBranch main</span><br><span class="line">          npm install hexo-cli -g</span><br><span class="line">          npm isntall hexo-deployer-git --save</span><br><span class="line">          npm install</span><br><span class="line"></span><br><span class="line">      - name: Deploy</span><br><span class="line">        run: |</span><br><span class="line">          hexo clean</span><br><span class="line">          hexo g</span><br><span class="line">          git config --global user.email &quot;hilinxinhui@gmail.com&quot;</span><br><span class="line">          git config --global user.name &quot;hilinxinhui&quot;</span><br><span class="line">          hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>网上不乏更加详细的配置过程记录和原理讲解文档，如<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/170563000">这个</a>和<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137867759">这个</a>，供参考。</p>
+<h3 id="推送和自动部署"><a href="#推送和自动部署" class="headerlink" title="推送和自动部署"></a>推送和自动部署</h3><p>完成上述配置后将本地仓库push到远程服务器即可完成自动化部署。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="主题和美化"><a href="#主题和美化" class="headerlink" title="主题和美化"></a>主题和美化</h3><p>这是一个完全主观环节，作者偏向使用简洁简单的主题，即使要在功能上妥协。</p>
+<p>于是，本站使用<a target="_blank" rel="noopener" href="https://github.com/kaedea/hexo-theme-hacker">hexo-theme-hacker</a>主题，这一主题修改自<a target="_blank" rel="noopener" href="https://github.com/CodeDaraW/Hacker">Hacker</a>主题。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/probberechts/hexo-theme-cactus">hexo-theme-cactus</a>、<a target="_blank" rel="noopener" href="https://github.com/KevinOfNeu/hexo-theme-xoxo">hexo-theme-xoxo</a>和<a target="_blank" rel="noopener" href="https://github.com/frostfan/hexo-theme-polarbear">hexo-theme-polarbear</a>也是作者很喜欢的风格。</p>
+<h3 id="首页折叠内容"><a href="#首页折叠内容" class="headerlink" title="首页折叠内容"></a>首页折叠内容</h3><p>用<code>&lt;!-- more --&gt;</code>标签划分想在首页显示的内容和不想在首页显示的内容。注意这种方法可能和使用的主题相关，请先参考具体使用的主题的说明文档。</p>
+<h3 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h3><p>诸如如何开启评论区、启用Google分析、设置文章标签等问题一般在使用的主题的文档中有说明，以Hacker为例，在<a target="_blank" rel="noopener" href="https://github.com/CodeDaraW/Hacker/blob/9c5801ed32cbf074a3f4bacd80a1bd193d12e2d8/README_zh-CN.md">这里</a>。有时使用的主题过于小众或想开（mo）发（gai）自己的主题，没有足够的文档资源可用，可以参考被广泛使用的主题的说明文档，如<a target="_blank" rel="noopener" href="https://butterfly.js.org/">butterfly</a>，毕竟原理都是相通的。</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/Dev/">Dev</a>, <a href="/categories/Dev/Web/">Web</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/hexo/">hexo</a><a href="/tags/git/">git</a><a href="/tags/CI-CD/">CI/CD</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

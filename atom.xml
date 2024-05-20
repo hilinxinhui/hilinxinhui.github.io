@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>hilinxinhui</title>
+  
+  
+  <link href="https://hilinxinhui.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://hilinxinhui.github.io/"/>
+  <updated>2024-05-20T11:49:34.014Z</updated>
+  <id>https://hilinxinhui.github.io/</id>
+  
+  <author>
+    <name>Xinhui Lin</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Do you really need ECC RAM with ZFS?</title>
+    <link href="https://hilinxinhui.github.io/2023/08/18/Do-you-really-need-ECC-RAM-with-ZFS/"/>
+    <id>https://hilinxinhui.github.io/2023/08/18/Do-you-really-need-ECC-RAM-with-ZFS/</id>
+    <published>2023-08-18T13:27:26.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本文是<a href="https://ianhowson.com/zfs/ecc-ram/">Do you really need ECC RAM with ZFS?</a>的翻译。</p><p>在使用ZFS文件系统时，你是否真正需要ECC内存？</p><span id="more"></span><h2 id="2024-02-06-update"><a href="#2024-02-06-update" class="headerlink" title="2024.02.06 update"></a>2024.02.06 update</h2><p>与其讨论诸如是否需要ECC内存和如何使用raid实现容灾等问题，增加数据副本和实施数据副本间同步才是真正重要的问题hhh。</p><h2 id="tl-dr"><a href="#tl-dr" class="headerlink" title="tl;dr"></a>tl;dr</h2><p>简而言之，并非完全必要。然而，如果你选择使用，生活将更加美好。</p><p>需要记住的是，ZFS绝对不会向你提供它认为是错误的数据。如果它检测到错误，它会给出一个错误提示，而绝不会提供错误的数据。所以如果你手上的非ECC内存已经能够正常工作了，通过升级ECC内存你将不会获得任何好处。</p><h2 id="为什么需要ECC内存-aka-ECC内存能带来什么"><a href="#为什么需要ECC内存-aka-ECC内存能带来什么" class="headerlink" title="为什么需要ECC内存 aka ECC内存能带来什么"></a>为什么需要ECC内存 aka ECC内存能带来什么</h2><p>问题在于，不存在完美的硬件。现代硬盘的设计标准允许10的15次方分之一左右的比特错误率。尽管这个故障率看起来很小，但需要强调的是现代硬盘的容量（按比特计）正在接近这个数字，也就是，当用户的数据装满了一个硬盘时，数据错误可能已经存在了。</p><p>大多数文件系统信任硬件提供的数据，并将这些数据直接传递给用户，数据中的问题会直接被暴露在用户眼前。当然，普通用户可能根本注意不带这些问题，毕竟现在大多数数据以高度压缩的视频、音频或图片等形式存在，微小的数据错误（如数据的某个比特上的数据翻转）对数据本身的影响微乎其微，用户对这种错误的宽容度很高。</p><p>让ZFS难以与非ECC内存一起使用的关键是，ZFS不属于上述<em>大多数系统</em>，ZFS不信任直接来自硬件的数据，ZFS在将数据传递给用户之前会首先对数据进行校验，当数据存在错误时ZFS拒绝继续向上传递（有问题的）数据，而是给出一个错误信息。假设用户在ZFS卷上有一个20GB的虚拟机镜像，并且它出现了一个无法纠正的位错误，整个镜像会被标记为“损坏”，ZFS将不会将其提供给用户。仅仅因为一个位的错误，而这个错误很可能本来也不重要。</p><p>当然，这里说的是<em>无法纠正</em>的错误。如果用户的数据完整地写入磁盘，且磁盘提供了相关机制保证数据正确性，那么这种错误几乎可以通过其他磁盘卷成员来纠正以保证提交给文件系统的数据的可靠性。</p><p>真正的麻烦是数据在被写入磁盘时就出错了，<em>能够正常工作的非ECC</em>内存对这种错误没有检查和纠正的能力，于是错误的数据被写入存储池的各个镜像，冗余的数据也是错误的，这种情况下ZFS不会向用户提供这些数据，用户只能寄希望于另一个备份。</p><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>为了让ZFS运行得更快更好而使用ECC内存是不现实的，ECC内存的真正作用是减少数据因为用户未知的微小的错误（这种微小的可能完全不影响使用的错误会因ZFS的“铁面无私”被放大，直到用户完全拿不到数据）而完全无法访问的可能性。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;本文是&lt;a href=&quot;https://ianhowson.com/zfs/ecc-ram/&quot;&gt;Do you really need ECC RAM with ZFS?&lt;/a&gt;的翻译。&lt;/p&gt;
+&lt;p&gt;在使用ZFS文件系统时，你是否真正需要ECC内存？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="NAS" scheme="https://hilinxinhui.github.io/categories/NAS/"/>
+    
+    <category term="TrueNAS" scheme="https://hilinxinhui.github.io/categories/NAS/TrueNAS/"/>
+    
+    
+    <category term="TrueNAS" scheme="https://hilinxinhui.github.io/tags/TrueNAS/"/>
+    
+    <category term="ECC内存" scheme="https://hilinxinhui.github.io/tags/ECC%E5%86%85%E5%AD%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>unraid OS boot device bug report</title>
+    <link href="https://hilinxinhui.github.io/2023/08/17/unraid-OS-boot-device-bug-report/"/>
+    <id>https://hilinxinhui.github.io/2023/08/17/unraid-OS-boot-device-bug-report/</id>
+    <published>2023-08-17T13:06:11.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>事情的背景是这样，考虑到TrueNAS对内存要求太高了，作者兴冲冲准备体验unraid。制作好启动盘后（截止至2023.8.16，试用最新版系统Unraid 6.12.3）准备安装unraid时，进入主机引导菜单能够识别unraid引导u盘，但选择启动设备后没有进入安装流程，而是反复重新进入boot menu（select boot device）。</p><span id="more"></span><h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这个问题作者以前从来没有见识过，本能地进行如下排查：</p><ul><li>BIOS设置，包括：<ul><li>两个虚拟化选项</li><li>FastBoot</li><li>SecureBoot</li></ul></li><li>boot USB，包括<ul><li>GUID状态（鉴于成功制作了安装盘应该不会有问题）</li><li>主板接口位置，从机箱前面板USB接口（USB2.0）换到了主板背板USB接口（USB2.0&amp;USB3.0）</li><li>贴吧有人说最好用USB2.0U盘制作启动盘，作者认为纯属扯淡</li></ul></li><li>铭瑄主板对unraid OS的兼容性</li><li>换设备重新制作启动盘</li><li>换不同版本的unraid OS（只测试了前一个版本）</li><li>校验下载的unraid OS压缩包完整性</li></ul><p>（以上排查内容没有先后顺序，想到啥做啥）</p><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>这个问题过于无厘头作者甚至不知道怎么描述，最后在贴吧里找到了一样的问题：unraid无法进入系统，无限进入BIOS，吧友“auick”的回答醍醐灌顶：</p><p>看看U盘根目录是不是有个“EFI-”，如果是，去掉最后横杠，改为 EFI</p><p><img src="/2023/08/17/unraid-OS-boot-device-bug-report/issue.png" alt="issue"></p><p><img src="/2023/08/17/unraid-OS-boot-device-bug-report/solution.png" alt="solution"></p><p>修改后成功启动。作者自信这几年装了各种各样奇怪的系统应该，操作应该符合标准流程，为什么启动盘会出现这种问题且几乎没有用户反馈这两件事完全超出了作者的认知。</p><p>作者最终还是选择了TrueNAS作为主力NAS系统，倒是和上面描述的bug没啥关系，主要原因是找到了合适的支持ECC内存的板U:）。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;事情的背景是这样，考虑到TrueNAS对内存要求太高了，作者兴冲冲准备体验unraid。制作好启动盘后（截止至2023.8.16，试用最新版系统Unraid 6.12.3）准备安装unraid时，进入主机引导菜单能够识别unraid引导u盘，但选择启动设备后没有进入安装流程，而是反复重新进入boot menu（select boot device）。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="NAS" scheme="https://hilinxinhui.github.io/categories/NAS/"/>
+    
+    <category term="UNRAID" scheme="https://hilinxinhui.github.io/categories/NAS/UNRAID/"/>
+    
+    
+    <category term="UNRAID" scheme="https://hilinxinhui.github.io/tags/UNRAID/"/>
+    
+    <category term="boot_device" scheme="https://hilinxinhui.github.io/tags/boot-device/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Windows Ubuntu双系统时间同步</title>
+    <link href="https://hilinxinhui.github.io/2023/08/14/Windows-Ubuntu%E5%8F%8C%E7%B3%BB%E7%BB%9F%E6%97%B6%E9%97%B4%E5%90%8C%E6%AD%A5/"/>
+    <id>https://hilinxinhui.github.io/2023/08/14/Windows-Ubuntu%E5%8F%8C%E7%B3%BB%E7%BB%9F%E6%97%B6%E9%97%B4%E5%90%8C%E6%AD%A5/</id>
+    <published>2023-08-14T00:47:03.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>2024.02.06更新</p><p>作者现在已经不用双系统了hhh</p><p>咕咕咕</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;p&gt;2024.02.06更新&lt;/p&gt;
+&lt;p&gt;作者现在已经不用双系统了hhh&lt;/p</summary>
+      
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    
+    <category term="Ubuntu" scheme="https://hilinxinhui.github.io/tags/Ubuntu/"/>
+    
+    <category term="Windows" scheme="https://hilinxinhui.github.io/tags/Windows/"/>
+    
+    <category term="双系统" scheme="https://hilinxinhui.github.io/tags/%E5%8F%8C%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>git submodules</title>
+    <link href="https://hilinxinhui.github.io/2023/08/14/git-submodules/"/>
+    <id>https://hilinxinhui.github.io/2023/08/14/git-submodules/</id>
+    <published>2023-08-14T00:46:17.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><span id="more"></span>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;span id=&quot;more&quot;&gt;&lt;/span&gt;
+
+</summary>
+      
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="VCS" scheme="https://hilinxinhui.github.io/categories/Dev/VCS/"/>
+    
+    
+    <category term="git" scheme="https://hilinxinhui.github.io/tags/git/"/>
+    
+    <category term="submodules" scheme="https://hilinxinhui.github.io/tags/submodules/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>合并git提交记录</title>
+    <link href="https://hilinxinhui.github.io/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/"/>
+    <id>https://hilinxinhui.github.io/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/</id>
+    <published>2023-08-07T02:04:58.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>使用git协同开发时，或更准确地说，当对commit message的书写有要求（如需要抓取changelog）且开发规模大（意味着不能完全完成某个feature后再统一提交）时，往往在将本地提交推送到远程分支之前需要精简提交记录。</p><p>本文介绍通过git rebase合并（本地）提交记录的方法。</p><span id="more"></span><h2 id="通过git-rebase合并提交记录"><a href="#通过git-rebase合并提交记录" class="headerlink" title="通过git rebase合并提交记录"></a>通过git rebase合并提交记录</h2><p>主要包括以下步骤：</p><ul><li>检查版本库状态和提交记录</li><li>开启rebase交互模式</li><li>选择要合并的记录</li><li>修改提交信息</li><li>检查版本库状态和提交记录</li></ul><p>开始和结束时的检查步骤是为了避免冲突。</p><h3 id="举个🌰"><a href="#举个🌰" class="headerlink" title="举个🌰"></a>举个🌰</h3><p>在rebse前请务必检查版本状态和已有提交记录：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git log</span><br></pre></td></tr></table></figure><p><img src="/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/git_log_1.png" alt="check_log"></p><p>开启交互模式，其中<code>commit_sha</code>是待合并的一系列记录的前一条记录（直观地，“rebase”的“base”）：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i &lt;commit_sha&gt; # 在这个例子里是0be9852</span><br></pre></td></tr></table></figure><p>选择要合并的记录，如图是执行以上命令后在终端中打开的文本编辑器，根据提示（注释）修改目标提交记录前的command tag即可。</p><p>修改前：</p><p><img src="/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/%E6%91%98%E5%8F%96%E5%88%86%E6%94%AF_1.png" alt="commit_selection"></p><p>修改后：</p><p><img src="/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/%E6%91%98%E5%8F%96%E5%88%86%E6%94%AF_2.png" alt="commit_selection_2"></p><p>修改提交信息，即将多条提交信息合并为一条。如图是执行以上命令后在终端中打开的文本编辑器，根据提示（注释）修改提交记录即可：</p><p><img src="/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/commit_message.png" alt="commit_message"></p><p>最后检查提交记录，确认无误后推送到远程分支：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git log</span><br><span class="line">git push</span><br></pre></td></tr></table></figure><p>合并前的提交记录：</p><p><img src="/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/git_log_1.png" alt="before_rebase"></p><p>合并后的提交记录：</p><p><img src="/2023/08/07/%E5%90%88%E5%B9%B6git%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/git_log_2.png" alt="after_rebase"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;使用git协同开发时，或更准确地说，当对commit message的书写有要求（如需要抓取changelog）且开发规模大（意味着不能完全完成某个feature后再统一提交）时，往往在将本地提交推送到远程分支之前需要精简提交记录。&lt;/p&gt;
+&lt;p&gt;本文介绍通过git rebase合并（本地）提交记录的方法。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="VCS" scheme="https://hilinxinhui.github.io/categories/Dev/VCS/"/>
+    
+    
+    <category term="git" scheme="https://hilinxinhui.github.io/tags/git/"/>
+    
+    <category term="rebase" scheme="https://hilinxinhui.github.io/tags/rebase/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GitHub academic benefits申请实录</title>
+    <link href="https://hilinxinhui.github.io/2023/08/03/GitHub-academic-benefits%E7%94%B3%E8%AF%B7%E5%AE%9E%E5%BD%95/"/>
+    <id>https://hilinxinhui.github.io/2023/08/03/GitHub-academic-benefits%E7%94%B3%E8%AF%B7%E5%AE%9E%E5%BD%95/</id>
+    <published>2023-08-03T09:44:05.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><img src="/2023/08/03/GitHub-academic-benefits%E7%94%B3%E8%AF%B7%E5%AE%9E%E5%BD%95/approved.png" alt="approved"></p><p>GitHub academic benefits申请通过了，可喜可贺！本文记录申请GitHub学生优惠（Benefits for Students）过程中的问题和解决方案供参考。</p><span id="more"></span><h2 id="原料"><a href="#原料" class="headerlink" title="原料"></a>原料</h2><p>仅包括作者申请时使用的材料，视申请时间和所在院校等条件有不同…不负责任地说，需要这些东西：</p><ul><li>畅通的网络（至少要能访问GitHub）</li><li>位置，具体说明在<a href="#%E5%AE%9A%E4%BD%8D">下面</a></li><li>学校提供的邮箱（教育邮箱）</li><li>校园卡（不同学校对学生证（带折页的，盖注册章的）和校园卡（看着像身份证的）的定位不同，选包含本人照片、校名和）</li><li>录取通知书</li><li>摄像头，具体说明在<a href="#%E8%AF%81%E6%98%8E%E6%9D%90%E6%96%99">下面</a></li></ul><h2 id="问题和解决方案"><a href="#问题和解决方案" class="headerlink" title="问题和解决方案"></a>问题和解决方案</h2><p><img src="/2023/08/03/GitHub-academic-benefits%E7%94%B3%E8%AF%B7%E5%AE%9E%E5%BD%95/two_failures.png" alt="two_failures"></p><h3 id="网络和定位"><a href="#网络和定位" class="headerlink" title="网络和定位"></a>网络和定位</h3><p>现在似乎不能直接访问GitHub了，所以首先要解决网络问题。但是申请时GitHub会核验定位（要求在校园内），作者申请时通过anygo强制修改位置信息。</p><h3 id="邮箱"><a href="#邮箱" class="headerlink" title="邮箱"></a>邮箱</h3><p>早期的申请流程不强制要求使用教育邮箱，并且不用教育邮箱时可以提交照片或文档证明在校生身份（换言之不需要准备摄像头），但现在看来不行，如下图（或许部分学校还是可以通过上面的方法操作的），需要提前在个人设置中添加和验证教育邮箱。</p><p><img src="/2023/08/03/GitHub-academic-benefits%E7%94%B3%E8%AF%B7%E5%AE%9E%E5%BD%95/school_issued_email_only.png" alt="school_issued_email_only"></p><p>需要说明的是不同（子）域名对应的邮箱对申请成功率有影响。以东北大学为例，默认教育邮箱是<code>学号@stu.neu.edu.cn</code>，邮箱支持设置别名（毕竟学号对于收件方不太友好），但别名邮箱的后缀是<code>别名@stumail.neu.edu.cn</code>，按照GitHub提示，使用前者通过的可能性更大。</p><h2 id="How-do-you-plan-to-use-GitHub"><a href="#How-do-you-plan-to-use-GitHub" class="headerlink" title="How do you plan to use GitHub?"></a>How do you plan to use GitHub?</h2><p>这条怎么填都可以，简单的“for programming”也行。</p><h3 id="证明材料"><a href="#证明材料" class="headerlink" title="证明材料"></a>证明材料</h3><p>在作者的申请过程中，证明材料只能实时拍摄，不能上传文件。作者提交了录取通知书和校园卡照片（合照），选择的证明材料类型是<code>Dated enrollment letter on school letterhead</code>。</p><h3 id="等待"><a href="#等待" class="headerlink" title="等待"></a>等待</h3><p>作者在2023年7月30日晚提交申请，2023年8月3日GitHub显示申请通过（未收到邮件）。</p><p><em>2023.8.6更新</em></p><p>2023年8月4日23:00收到申请通过通知邮件。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/2023/08/03/GitHub-academic-benefits%E7%94%B3%E8%AF%B7%E5%AE%9E%E5%BD%95/approved.png&quot; alt=&quot;approved&quot;&gt;&lt;/p&gt;
+&lt;p&gt;GitHub academic benefits申请通过了，可喜可贺！本文记录申请GitHub学生优惠（Benefits for Students）过程中的问题和解决方案供参考。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="GitHub" scheme="https://hilinxinhui.github.io/categories/Dev/GitHub/"/>
+    
+    
+    <category term="github_benefits，copilot" scheme="https://hilinxinhui.github.io/tags/github-benefits%EF%BC%8Ccopilot/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Standard README (for GitHub)</title>
+    <link href="https://hilinxinhui.github.io/2023/07/30/Standard-README-for-GitHub/"/>
+    <id>https://hilinxinhui.github.io/2023/07/30/Standard-README-for-GitHub/</id>
+    <published>2023-07-30T11:20:29.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本文总结标准化README文档写作需要覆盖哪些内容。</p><ul><li><a href="https://github.com/RichardLitt/standard-readme">Standard README</a></li><li><a href="https://github.com/RichardLitt/standard-readme/tree/main/example-readmes">Standard README examples</a></li><li><a href="https://github.com/hackergrrl/art-of-readme">Art of README</a></li></ul><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;本文总结标准化README文档写作需要覆盖哪些内容。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/RichardLitt/standard-readme&quot;&gt;Standard README&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/RichardLitt/standard-readme/tree/main/example-readmes&quot;&gt;Standard README examples&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/hackergrrl/art-of-readme&quot;&gt;Art of README&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="VCS" scheme="https://hilinxinhui.github.io/categories/Dev/VCS/"/>
+    
+    
+    <category term="Markdown" scheme="https://hilinxinhui.github.io/tags/Markdown/"/>
+    
+    <category term="GitHub README" scheme="https://hilinxinhui.github.io/tags/GitHub-README/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PyTorch-Lightning notes</title>
+    <link href="https://hilinxinhui.github.io/2023/07/30/PyTorch-Lightning-notes/"/>
+    <id>https://hilinxinhui.github.io/2023/07/30/PyTorch-Lightning-notes/</id>
+    <published>2023-07-30T06:56:07.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><a href="https://lightning.ai/docs/pytorch/stable/">PyTorch-Lightning文档</a></p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;a href=&quot;https://lightning.ai/docs/pytorch/stable/&quot;&gt;PyTorch-Lightning文档&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="DeepLearning" scheme="https://hilinxinhui.github.io/categories/DeepLearning/"/>
+    
+    <category term="Python" scheme="https://hilinxinhui.github.io/categories/Dev/Python/"/>
+    
+    <category term="PyTorch" scheme="https://hilinxinhui.github.io/categories/DeepLearning/PyTorch/"/>
+    
+    
+    <category term="deep_learning" scheme="https://hilinxinhui.github.io/tags/deep-learning/"/>
+    
+    <category term="PyTorch" scheme="https://hilinxinhui.github.io/tags/PyTorch/"/>
+    
+    <category term="trainer" scheme="https://hilinxinhui.github.io/tags/trainer/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Markdown TOC</title>
+    <link href="https://hilinxinhui.github.io/2023/07/24/Markdown-TOC/"/>
+    <id>https://hilinxinhui.github.io/2023/07/24/Markdown-TOC/</id>
+    <published>2023-07-24T07:21:43.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><a href="https://github.com/RichardLitt/standard-readme">Standard-README</a>要求一个标准的README文件（maximal version）应当包含目录（Table of Contents，TOC），本文介绍一个能够实现Markdown文档TOC生成的方便的插件，<a href="https://github.com/shd101wyy/markdown-preview-enhanced">Markdown Preview Enhanced</a>。</p><span id="more"></span><h2 id="MPE"><a href="#MPE" class="headerlink" title="MPE"></a>MPE</h2><p>MPE是一个服务Markdown文件的插件，目前支持VScode和Atom：</p><ul><li><a href="https://github.com/shd101wyy/markdown-preview-enhanced">这里</a>是它的GitHub仓库地址</li><li><a href="https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced">这里</a>是它在VScode插件商店中的地址</li></ul><p>MPE能实现各种各样的与Markdown格式相关的操作，这里只讨论插入目录这一个功能。当然反过来说能实现向Markdown文档中插入目录功能的插件&#x2F;脚本不止这一个，类似的产品包括<a href="https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one">Markdown All in One</a>和<a href="https://github.com/jonschlinkert/markdown-toc">markdown-toc</a>等，选择MPE是因为它更简单的操作和更完善的文档。</p><h2 id="Generate-TOC-using-MPE"><a href="#Generate-TOC-using-MPE" class="headerlink" title="Generate TOC using MPE"></a>Generate TOC using MPE</h2><p>作者通常使用的文本编辑器是VScode，通过MPE在Markdown文档中插入TOC，可以直接在VScode集成的插件商店中搜索安装MPE。</p><p>安装完成后设置通过MDP预览Markdown文档，注意这一步是必须的。</p><p>要在Markdown文档中插入TOC，首先在文档要插入目录的位置添加以下内容：</p><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- @import &quot;[TOC]&quot; &#123;cmd=&quot;toc&quot; depthFrom=1 depthTo=6 orderedList=false&#125; --&gt;</span></span><br></pre></td></tr></table></figure><p>上述代码不需要手动输入，按下<code>Ctrl</code> + <code>Shift</code> + <code>P</code>唤出panel后输入<code>create TOC</code>即可：</p><p><img src="/2023/07/24/Markdown-TOC/vscode_panel.png" alt="vscode_panel"></p><p>打开预览（<code>Ctrl</code> + <code>K</code> <code>V</code>）后保存（<code>Ctrl</code> + <code>S</code>），即可生成TOC。显然TOC依据Markdown文档中的标题生成，修改上面插入内容中的<code>depthFrom</code>和<code>depthTo</code>字段可以设置抓取的标题级别；对于不想被抓取生成TOC的标题，在其后添加<code>&#123;ignore=true&#125;</code>标签即可，注意此标签不会被GitHub的Markdown渲染器忽略，生成TOC后记得删除此标签。</p><p>更多标签设置请参考<a href="https://shd101wyy.github.io/markdown-preview-enhanced/#/zh-cn/toc">此文档</a>。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;a href=&quot;https://github.com/RichardLitt/standard-readme&quot;&gt;Standard-README&lt;/a&gt;要求一个标准的README文件（maximal version）应当包含目录（Table of Contents，TOC），本文介绍一个能够实现Markdown文档TOC生成的方便的插件，&lt;a href=&quot;https://github.com/shd101wyy/markdown-preview-enhanced&quot;&gt;Markdown Preview Enhanced&lt;/a&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Docs" scheme="https://hilinxinhui.github.io/categories/Dev/Docs/"/>
+    
+    
+    <category term="Markdown" scheme="https://hilinxinhui.github.io/tags/Markdown/"/>
+    
+    <category term="table_of_contents" scheme="https://hilinxinhui.github.io/tags/table-of-contents/"/>
+    
+    <category term="GitHub" scheme="https://hilinxinhui.github.io/tags/GitHub/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Install latexindent.pl</title>
+    <link href="https://hilinxinhui.github.io/2023/07/24/Install-latexindent-pl/"/>
+    <id>https://hilinxinhui.github.io/2023/07/24/Install-latexindent-pl/</id>
+    <published>2023-07-24T01:39:32.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><blockquote><p>latexindent.pl is a perl script to beautify&#x2F;tidy&#x2F;format&#x2F;indent (add horizontal leading space to) code within environments, commands, after headings and within special code blocks. It has the ability to align delimiters in environments and commands, and can modify line breaks including text wrapping and one-sentence-per-line. It can also perform string-based and regex-based substitutions&#x2F;replacements. The script is customisable through its YAML interface.</p></blockquote><p><code>latexindent.pl</code>是一个<code>Perl</code>脚本，用于美化&#x2F;整理&#x2F;格式化&#x2F;缩进（在环境、命令、标题后以及特殊代码块内添加水平前导空格）代码。它具有对环境和命令中的定界符进行对齐的功能，可以修改换行符，通过文本换行实现每行一个句子。它还可以执行基于字符串或正则表达式的替换。该脚本可通过其YAML文件接口进行定制。</p><p>安装过程参考<a href="https://latexindentpl.readthedocs.io/en/latest/sec-how-to-use.html">此文档</a>。本文记录在<code>Ubuntu 20.04</code>系统上安装和使用<code>latexindent</code>的过程。</p><span id="more"></span><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>安装<code>perl</code>和必要的</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install perl</span><br><span class="line">sudo cpan -i App::cpanminus</span><br><span class="line">sudo cpanm YAML::Tiny</span><br><span class="line">sudo cpanm File::HomeDir</span><br><span class="line">sudo cpanm Unicode::GCString</span><br><span class="line">sudo cpanm Log::Log4perl</span><br><span class="line">sudo cpanm Log::Dispatch::File</span><br></pre></td></tr></table></figure><p>上述命令执行完毕后<code>latexindent</code>就安装好了，检查一下：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">latexindent -v</span><br></pre></td></tr></table></figure><p><img src="/2023/07/24/Install-latexindent-pl/latexindent_version.png" alt="latexindent_version"></p><p>同样提供<code>without perl</code>的安装选项，请参考文档的<a href="https://latexindentpl.readthedocs.io/en/latest/sec-how-to-use.html#ubuntu-linux-users-without-perl">这一部分</a>。也可以用<code>conda</code>或<code>docker</code>安装，请自行查阅文档。</p><h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p><a href="https://latexindentpl.readthedocs.io/en/latest/sec-demonstration.html">文档中</a>给了效果演示。以下内容为了验证在本机上正确安装<code>latexindent</code>。</p><p>原始文档长这样：</p><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">\section</span>&#123;引言&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">\begin</span>&#123;frame&#125;</span><br><span class="line"><span class="keyword">\frametitle</span>&#123;<span class="keyword">\textbf</span>&#123;引言&#125;&#125;</span><br><span class="line">            <span class="keyword">\begin</span>&#123;block&#125;&#123;<span class="keyword">\textbf</span>&#123;研究背景&#125;&#125;</span><br><span class="line">                <span class="keyword">\begin</span>&#123;itemize&#125;</span><br><span class="line">      <span class="keyword">\item</span> 短信息(SMS)成为现代通讯的重要组成部分</span><br><span class="line">                    <span class="keyword">\item</span> 很多组织或网站使用短信息作为身份验证的辅助通道</span><br><span class="line">                    <span class="keyword">\item</span> 现代短消息的发送，在抵达终端之前不接触蜂窝网络         </span><br><span class="line">                <span class="keyword">\end</span>&#123;itemize&#125;</span><br><span class="line">            <span class="keyword">\end</span>&#123;block&#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">\begin</span>&#123;block&#125;&#123;<span class="keyword">\textbf</span>&#123;主要工作&#125;&#125;</span><br><span class="line">                <span class="keyword">\begin</span>&#123;itemize&#125;</span><br><span class="line">    <span class="keyword">\item</span> 对SMS数据进行迄今为止最大的挖掘分析</span><br><span class="line">                    <span class="keyword">\item</span> 评估良性短消息服务的安全态势</span><br><span class="line">                    <span class="keyword">\item</span> 刻画通过SMS网关进行的恶意行为</span><br><span class="line">                <span class="keyword">\end</span>&#123;itemize&#125;</span><br><span class="line">            <span class="keyword">\end</span>&#123;block&#125;</span><br><span class="line"><span class="keyword">\end</span>&#123;frame&#125;</span><br></pre></td></tr></table></figure><p>使用<code>latexindent</code>格式化后的效果像这样：</p><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">\section</span>&#123;引言&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">\begin</span>&#123;frame&#125;</span><br><span class="line"><span class="keyword">\frametitle</span>&#123;<span class="keyword">\textbf</span>&#123;引言&#125;&#125;</span><br><span class="line"><span class="keyword">\begin</span>&#123;block&#125;&#123;<span class="keyword">\textbf</span>&#123;研究背景&#125;&#125;</span><br><span class="line"><span class="keyword">\begin</span>&#123;itemize&#125;</span><br><span class="line"><span class="keyword">\item</span> 短信息(SMS)成为现代通讯的重要组成部分</span><br><span class="line"><span class="keyword">\item</span> 很多组织或网站使用短信息作为身份验证的辅助通道</span><br><span class="line"><span class="keyword">\item</span> 现代短消息的发送，在抵达终端之前不接触蜂窝网络</span><br><span class="line"><span class="keyword">\end</span>&#123;itemize&#125;</span><br><span class="line"><span class="keyword">\end</span>&#123;block&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">\begin</span>&#123;block&#125;&#123;<span class="keyword">\textbf</span>&#123;主要工作&#125;&#125;</span><br><span class="line"><span class="keyword">\begin</span>&#123;itemize&#125;</span><br><span class="line"><span class="keyword">\item</span> 对SMS数据进行迄今为止最大的挖掘分析</span><br><span class="line"><span class="keyword">\item</span> 评估良性短消息服务的安全态势</span><br><span class="line"><span class="keyword">\item</span> 刻画通过SMS网关进行的恶意行为</span><br><span class="line"><span class="keyword">\end</span>&#123;itemize&#125;</span><br><span class="line"><span class="keyword">\end</span>&#123;block&#125;</span><br><span class="line"><span class="keyword">\end</span>&#123;frame&#125;</span><br></pre></td></tr></table></figure><p>更多命令参数请参考<a href="https://latexindentpl.readthedocs.io/en/latest/sec-how-to-use.html">这里</a>。</p><h2 id="集成在VScode中"><a href="#集成在VScode中" class="headerlink" title="集成在VScode中"></a>集成在VScode中</h2><p>to be continued…</p>]]></content>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;latexindent.pl is a perl script to beautify&amp;#x2F;tidy&amp;#x2F;format&amp;#x2F;indent (add horizontal leading space to) code within environments, commands, after headings and within special code blocks. It has the ability to align delimiters in environments and commands, and can modify line breaks including text wrapping and one-sentence-per-line. It can also perform string-based and regex-based substitutions&amp;#x2F;replacements. The script is customisable through its YAML interface.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;code&gt;latexindent.pl&lt;/code&gt;是一个&lt;code&gt;Perl&lt;/code&gt;脚本，用于美化&amp;#x2F;整理&amp;#x2F;格式化&amp;#x2F;缩进（在环境、命令、标题后以及特殊代码块内添加水平前导空格）代码。它具有对环境和命令中的定界符进行对齐的功能，可以修改换行符，通过文本换行实现每行一个句子。它还可以执行基于字符串或正则表达式的替换。该脚本可通过其YAML文件接口进行定制。&lt;/p&gt;
+&lt;p&gt;安装过程参考&lt;a href=&quot;https://latexindentpl.readthedocs.io/en/latest/sec-how-to-use.html&quot;&gt;此文档&lt;/a&gt;。本文记录在&lt;code&gt;Ubuntu 20.04&lt;/code&gt;系统上安装和使用&lt;code&gt;latexindent&lt;/code&gt;的过程。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Typesetting" scheme="https://hilinxinhui.github.io/categories/Typesetting/"/>
+    
+    <category term="LaTeX" scheme="https://hilinxinhui.github.io/categories/Typesetting/LaTeX/"/>
+    
+    <category term="Perl" scheme="https://hilinxinhui.github.io/categories/Dev/Perl/"/>
+    
+    
+    <category term="LaTeX" scheme="https://hilinxinhui.github.io/tags/LaTeX/"/>
+    
+    <category term="latexindent" scheme="https://hilinxinhui.github.io/tags/latexindent/"/>
+    
+    <category term="perl" scheme="https://hilinxinhui.github.io/tags/perl/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>v2ray后续</title>
+    <link href="https://hilinxinhui.github.io/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/"/>
+    <id>https://hilinxinhui.github.io/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/</id>
+    <published>2023-07-19T12:53:13.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>部分操作（包括git操作、部分需要wget&#x2F;curl的场景）在命令行中进行，需要手动设置命令行代理。</p><p>本文讨论限于Windows，Linux和MacOS下的操作方式相同，请参考<a href="https://v2free.org/doc/#/faq?id=%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86">官方文档</a>。</p><span id="more"></span><h2 id="设置终端代理"><a href="#设置终端代理" class="headerlink" title="设置终端代理"></a>设置终端代理</h2><h3 id="Windows-powershell-curl"><a href="#Windows-powershell-curl" class="headerlink" title="Windows powershell curl"></a>Windows powershell curl</h3><p>使用<code>curl</code>命令测试终端代理设置。在<code>PowerShell</code>中使用<code>curl</code>命令时，出现问题如下：</p><p><img src="/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/curl_invoke_webrequest.PNG" alt="curl_invoke_webrequest"></p><p>问题的起因和比较复杂的解决方案参考<a href="https://artiga.pages.dev/2021/pwsh-iwr-without-ie/">这里</a>。</p><p>考虑到作者在Windows下使用<code>curl</code>命令的场景屈指可数，简单的解决方案：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl www.google.com -UseBasicParsing</span><br></pre></td></tr></table></figure><p>先试试百度：</p><p><img src="/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/baidu.PNG" alt="baidu"></p><p>连通性没有问题，再试试谷歌，注意此时还没有设置终端代理：</p><p><img src="/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/google_fail.PNG" alt="google_fail"></p><p>显然是失败了，终端代理设置方法<a href="#%E8%AE%BE%E7%BD%AE%E7%BB%88%E7%AB%AF%E4%BB%A3%E7%90%86">见下</a>。</p><p>注意不要用<code>ping</code>命令测试连通性，协议不一样。</p><h3 id="设置终端代理-1"><a href="#设置终端代理-1" class="headerlink" title="设置终端代理"></a>设置终端代理</h3><p>先检查端口号，在<code>v2rayn</code>的参数设置里：</p><p><img src="/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/v2rayn_setting.PNG" alt="port_setting"></p><p>可以在命令行中设置：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用sock5代理</span></span><br><span class="line">set http_proxy=socks5://127.0.0.1:10808</span><br><span class="line">set https_proxy=socks5://127.0.0.1:10808</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">取消设置</span></span><br><span class="line">set http_proxy=</span><br><span class="line">set https_proxy=</span><br></pre></td></tr></table></figure><p>但这种方案是临时的。为了不反复设置，可以将上述内容写进环境变量（用户变量即可），像这样：</p><p><img src="/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/user_path.PNG" alt="add_to_path"></p><p>设置后重启终端测试：</p><p><img src="/2023/07/19/v2ray%E5%90%8E%E7%BB%AD/google_done.PNG" alt="google_done"></p><p>成功。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;部分操作（包括git操作、部分需要wget&amp;#x2F;curl的场景）在命令行中进行，需要手动设置命令行代理。&lt;/p&gt;
+&lt;p&gt;本文讨论限于Windows，Linux和MacOS下的操作方式相同，请参考&lt;a href=&quot;https://v2free.org/doc/#/faq?id=%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86&quot;&gt;官方文档&lt;/a&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Network" scheme="https://hilinxinhui.github.io/categories/Dev/Network/"/>
+    
+    
+    <category term="v2free" scheme="https://hilinxinhui.github.io/tags/v2free/"/>
+    
+    <category term="proxy" scheme="https://hilinxinhui.github.io/tags/proxy/"/>
+    
+    <category term="GFW" scheme="https://hilinxinhui.github.io/tags/GFW/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Shell Scripts</title>
+    <link href="https://hilinxinhui.github.io/2023/07/16/Shell-Scripts/"/>
+    <id>https://hilinxinhui.github.io/2023/07/16/Shell-Scripts/</id>
+    <published>2023-07-16T11:31:45.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><img src="/2023/07/16/Shell-Scripts/neofetch.png" alt="neofetch"></p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/2023/07/16/Shell-Scripts/neofetch.png&quot; alt=&quot;neofetch&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Linux" scheme="https://hilinxinhui.github.io/categories/Dev/Linux/"/>
+    
+    
+    <category term="Shell,terminal" scheme="https://hilinxinhui.github.io/tags/Shell-terminal/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>备份</title>
+    <link href="https://hilinxinhui.github.io/2023/07/14/%E5%A4%87%E4%BB%BD/"/>
+    <id>https://hilinxinhui.github.io/2023/07/14/%E5%A4%87%E4%BB%BD/</id>
+    <published>2023-07-14T11:45:23.000Z</published>
+    <updated>2024-05-20T11:49:34.030Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本文是MIT Missing Semester 2019 Lecture 9 Backups一讲的翻译和整理，原文见<a href="https://missing-semester-cn.github.io/2019/backups/">这里</a>。</p><p>世界上只有两种人：</p><ul><li>备份数据的人</li><li>将要备份数据的人</li></ul><p>个人拥有的任何未备份的数据都有可能随时消失且永远无法恢复。本文介绍数据备份的基本原则，同时讨论某些数据备份方式存在的问题。</p><span id="more"></span><h2 id="3-2-1原则"><a href="#3-2-1原则" class="headerlink" title="3-2-1原则"></a>3-2-1原则</h2><p>3-2-1原则是一种推荐的备份策略，它的内容是：</p><ul><li>至少有<strong>3</strong>份数据副本</li><li>至少有<strong>2</strong>份数据副本存在不同的介质中</li><li>至少有<strong>1</strong>份数据副本是离场（offsite<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="本文涉及的`onsite`和`offsite`限于数据存储和数据备份范畴内。onsite（现场/本地）指将数据备份存储在与原始数据位于同一地点或物理位置的地方，例如本地硬盘、服务器或存储设备。这种备份方式提供了方便的访问和快速恢复的优势。offsite（离场/远程）指将数据备份存储在原始数据所在地点之外的地方，通常是远程位置或者云存储服务提供商的服务器上。离线备份的目的是保护数据免受物理灾害、盗窃或其他灾难的损害。即使本地发生损失，通过离线备份可以确保数据的安全性和可恢复性。">[1]</span></a></sup>）的</li></ul><p>这个原则的主要理念是<em>不要在一棵树上吊死（ot to put all your eggs in one basket）</em>。具体地：</p><ul><li><strong>3</strong>：在不考虑成本的前提下数据副本自然是多多益善，可惜这是不可能的。硬盘并不是免费的；即使对用上PCIE4.0的固态硬盘，大规模数据的对拷也很花时间；更重要地，数据具备结构，为大规模数据编制索引（指给你看的索引）简直是灾难</li><li><strong>2</strong>：拥有两个（及以上）的硬件备份可以保证硬件单点故障不会把重要数据一波带走</li><li><strong>1</strong>：有一些小概率的极端的情况，比如遭遇火灾或入室盗窃，会使得现场（onsite<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="本文涉及的`onsite`和`offsite`限于数据存储和数据备份范畴内。onsite（现场/本地）指将数据备份存储在与原始数据位于同一地点或物理位置的地方，例如本地硬盘、服务器或存储设备。这种备份方式提供了方便的访问和快速恢复的优势。offsite（离场/远程）指将数据备份存储在原始数据所在地点之外的地方，通常是远程位置或者云存储服务提供商的服务器上。离线备份的目的是保护数据免受物理灾害、盗窃或其他灾难的损害。即使本地发生损失，通过离线备份可以确保数据的安全性和可恢复性。">[1]</span></a></sup>）数据&#x2F;备份数据丢失，这是倘若有离场备份，很大程度上可以减少数据伤亡；现场数据强调即时可用性，离场数据则强调天灾人祸下的容错性</li></ul><h2 id="没有真正可靠的系统"><a href="#没有真正可靠的系统" class="headerlink" title="没有真正可靠的系统"></a>没有真正可靠的系统</h2><p>在进一步讨论数据备份的细节之前必须强调的是，不存在真正可靠的系统。请不要盲目相信系统（无论是备份软件还是备份服务提供商，或用于备份的硬件系统）所说的，必须亲自测试确保备份确实可以正确地被用于还原。</p><h2 id="版本管理"><a href="#版本管理" class="headerlink" title="版本管理"></a>版本管理</h2><p>首先，RAID和备份并不等价，镜像同步同样不是备份。仅仅是将你的数据同步到某个地方对下述数据威胁基本没有抵抗力：</p><ul><li>数据损坏</li><li>恶意软件</li><li>误删文件</li></ul><p>包括RAID和镜像同步在内的大多数人可能认为的“数据备份”方案存在的问题是，母本（或者说“主本”？）的修改会被同步到副本（或者说“子本”？），如果这些修改来源于数据损坏（SSD掉盘？）或恶意软件（比如勒索病毒）或误删文件（经常发生的事情），而变化被原封不动地传递到副本上，那么原始的正确数据几乎没有被恢复的可能。相当多的云存储方案存在上述问题，或许它们能在短时间内保留已删除的数据（回收站），但相关接口对大量文件并不友好。</p><p>真正的合适的数据备份系统应该包含版本控制功能以防御上述故障模式的。通过备份系统提供的不同时间点的快照，用户可以轻松定位数据修改并<em>理论上</em>恢复任何丢失的内容。</p><h2 id="备份数据去重"><a href="#备份数据去重" class="headerlink" title="备份数据去重"></a>备份数据去重</h2><p>让我们继续版本管理的讨论。数据的不同版本快照可能差距并不大，但如果系统为每一个快照创建一个完整的、真正的数据副本，这对存储介质来说恐怕是非常昂贵的。因此，合适的数据备份系统应该有数据去重的功能，通过跟踪已经存储的内容实现增量备份，快照保存的不是真正的数据，而是版本的<strong>修改</strong>，从而显著释放存储介质的压力。</p><h2 id="加密备份数据"><a href="#加密备份数据" class="headerlink" title="加密备份数据"></a>加密备份数据</h2><p>考虑到现在使用云盘备份数据是被广泛采用的策略，那么如果直接上传原始数据，用户将面临将数据暴露在并不受欢迎的第三方眼前的风险（当然在国内这种情况不是风险而是必然发生的事）。为了防止上述情况的发生，部分备份解决方案提供了客户端的解密工具，数据在被上传到服务端前先被加密，密钥由用户持有。</p><p>多说一句，大部分用户给自己的电脑设置登录密码，但并不加密自己的硬盘（或硬盘分区），这样任何获取这些用户的电脑的人都可以轻易绕过用户访问控制并读取硬盘上数据。现代硬件支持对加密数据进行快速高效的读写，可以考虑启用全盘加密功能。</p><h2 id="“追加模式”（Append-only）"><a href="#“追加模式”（Append-only）" class="headerlink" title="“追加模式”（Append only）"></a>“追加模式”（Append only）</h2><p>目前为止讨论的设备硬件故障或用户误操作导致的数据丢失，这一部分讨论针对数据恶意行为。假设有恶意用户入侵了我们的系统，他们是否能够删除我们的重要备份数据？</p><p>为了解决这种问题，通常引入带有“追加模式”的备份系统，它的模式通常是：备份服务器允许用户发送新数据但不允许用户删除，通常用户持有两把密钥，一把是追加模式密钥，用于创建新备份；一把完整权限密钥，用于删除不再需要的旧备份。完整权限密钥离线（offline）保存。</p><h2 id="一些其他的考虑"><a href="#一些其他的考虑" class="headerlink" title="一些其他的考虑"></a>一些其他的考虑</h2><p>其他备份系统用户可能要考虑的问题包括：</p><ul><li>定期备份：我想这个不需要多说</li><li>差异备份：就是增量备份</li><li>追加模式备份：讨论过了</li><li>可引导备份：这个还没讨论过，可引导备份指的是将整块磁盘拷贝下来，包括其中的操作系统引导分区，这样做好的数据副本可以直接接上主板作为“系统盘”使用</li></ul><h2 id="网络服务和网页"><a href="#网络服务和网页" class="headerlink" title="网络服务和网页"></a>网络服务和网页</h2><p>某些数据并不存在硬盘里，它们像是网络服务的副产物。比如Google Docs中的文档，或者某些流媒体的播放列表，又或者是电子邮件。某些软件可以备份这些数据（比如各种邮件客户端），当然用户也可以使用服务提供商开放的API下载这些数据。</p><p>类似地，大量数据实际上是网页内容的一部分。要备份（或许应该是保存）这些数据，可以使用<a href="https://archive.org/web/">Wayback Machine</a>，这是一个由非营利性组织Internet Archive管理的大规模世界各网页的数字存档，该组织致力于保护各种媒体，Wayback Machine允许您捕获和存档网页，以便以后检索该网站已存档的所有快照。当然也可以自己爬取数据，但在使用爬虫前请注意目标网站的许可证。</p><h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><p>这里列举了一些用于备份的软件或服务：</p><ul><li>Tarsnap</li><li>Borg Backup</li><li>rsync</li><li>rclone</li></ul><p>这些软件本文作者我全都没用过。</p><h2 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h2><ol><li>看看你的备份工作流是否存在问题（或者是否有这个备份工作流），若有（或压根没有工作流），修复它</li><li>试着备份你的邮箱账户</li><li>选一个你蝉蛹的网络服务，看看有多少种进行数据备份的方式</li><li>选一个你经常访问的网站，看看它在archive.org中有多少个版本</li><li>实现备份去重的一种高效方案是使用硬链接<sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="符号链接（也称为软链接）是一个指向另一个文件或文件夹的文件，而硬链接是指针的精确副本（它使用相同的inode并指向磁盘上的相同位置）。因此，如果删除了原始文件，符号链接就无法工作，而硬链接则不会受影响。然而，硬链接仅适用于文件。">[2]</span></a></sup>，尝试用<code>ln</code>创建硬链接，并比较硬链接和软链接的区别</li></ol><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>Missing Semester 2020课程中关于数据备份的内容不再单独讨论。</p><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">本文涉及的<code>onsite</code>和<code>offsite</code>限于数据存储和数据备份范畴内。onsite（现场/本地）指将数据备份存储在与原始数据位于同一地点或物理位置的地方，例如本地硬盘、服务器或存储设备。这种备份方式提供了方便的访问和快速恢复的优势。offsite（离场/远程）指将数据备份存储在原始数据所在地点之外的地方，通常是远程位置或者云存储服务提供商的服务器上。离线备份的目的是保护数据免受物理灾害、盗窃或其他灾难的损害。即使本地发生损失，通过离线备份可以确保数据的安全性和可恢复性。<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">符号链接（也称为软链接）是一个指向另一个文件或文件夹的文件，而硬链接是指针的精确副本（它使用相同的inode并指向磁盘上的相同位置）。因此，如果删除了原始文件，符号链接就无法工作，而硬链接则不会受影响。然而，硬链接仅适用于文件。<a href="#fnref:2" rev="footnote"> ↩</a></span></li></ol></div></div>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;本文是MIT Missing Semester 2019 Lecture 9 Backups一讲的翻译和整理，原文见&lt;a href=&quot;https://missing-semester-cn.github.io/2019/backups/&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;世界上只有两种人：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;备份数据的人&lt;/li&gt;
+&lt;li&gt;将要备份数据的人&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;个人拥有的任何未备份的数据都有可能随时消失且永远无法恢复。本文介绍数据备份的基本原则，同时讨论某些数据备份方式存在的问题。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Data" scheme="https://hilinxinhui.github.io/categories/Dev/Data/"/>
+    
+    
+    <category term="backup" scheme="https://hilinxinhui.github.io/tags/backup/"/>
+    
+    <category term="data_security" scheme="https://hilinxinhui.github.io/tags/data-security/"/>
+    
+    <category term="missing_semester" scheme="https://hilinxinhui.github.io/tags/missing-semester/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在博客中添加脚注</title>
+    <link href="https://hilinxinhui.github.io/2023/07/13/%E5%9C%A8%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%B7%BB%E5%8A%A0%E8%84%9A%E6%B3%A8/"/>
+    <id>https://hilinxinhui.github.io/2023/07/13/%E5%9C%A8%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%B7%BB%E5%8A%A0%E8%84%9A%E6%B3%A8/</id>
+    <published>2023-07-13T15:39:50.000Z</published>
+    <updated>2024-05-20T11:49:34.030Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>在Hexo博文中添加脚注需要两个条件， 分别是：</p><ul><li>支持脚注（当然还有更多拓展格式和功能，比如表格，比如更好地和HTML、LaTeX等格式互转。这里我们只关心脚注）的Mardown（Multi-Markdown， MMD）</li><li>支持MMD的渲染器（Hexo插件）</li></ul><span id="more"></span><h2 id="MMD"><a href="#MMD" class="headerlink" title="MMD"></a>MMD</h2><p>本文无意考证Markdown的“语言标准”，止<em>天不生我MMD，Markdown（指基本语法）脚注万古如长夜</em>尔。截止至本文写作时，MMD已经更新至版本<code>6.7.0</code>，详见<a href="https://github.com/fletcher/MultiMarkdown-6">MMD_GitHub_Page</a>。</p><p>脚注包括两个部分，第一部分写在正文里，是所有脚注内容的索引；第二部分一般写在文末，是具体地脚注内容，这些内容构成了脚注全体。有了MMD，索引部分在正文中插入<code>[^&#123;footnote_tag&#125;]</code>即可，具体脚注内容写法看起来像这样：<code>[^footnote_tag]: 这是一条插入的脚注，作者用的插件使得代码框内的脚注也生效</code>。渲染之后看起来像这样：</p><p>插入一条脚注<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="这是一条插入的脚注">[1]</span></a></sup>。</p><p>当然这里的脚注效果在MMD的基础上增加了悬停显示（鼠标放置在超链接区域时显示脚注内容）和点击跳转（双向跳转）的功能，这些功能是hexo插件提供的，具体<a href="#hexo%E6%8F%92%E4%BB%B6">见下</a>。</p><h2 id="Hexo插件"><a href="#Hexo插件" class="headerlink" title="Hexo插件"></a>Hexo插件</h2><p>Hexo默认Markdown渲染器不支持脚注语法，需要安装插件，这里以<code>hexo-reference</code><sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/kchen0x/hexo-reference">[2]</span></a></sup>为例。</p><p>安装<code>hexo-reference</code>：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-reference --save</span></span><br></pre></td></tr></table></figure><p>并在<code>_config.yml</code>中<code>plugins</code>字段下加入<code>hexo-reference</code>：</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">plugins:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">hexo-reference</span></span><br></pre></td></tr></table></figure><p>除此之外，</p><ul><li><code>hexo-reference-plus</code><sup id="fnref:3"><a href="#fn:3" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/maxchang3/hexo-reference-plus">[3]</span></a></sup></li><li><code>hexo-renderer-markdown-it</code><sup id="fnref:4"><a href="#fn:4" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/hexojs/hexo-renderer-markdown-it">[4]</span></a></sup></li></ul><p>等插件也可以实现类似的功能。</p><p><code>hexo-reference</code>插件还有一点小bug，包括：</p><ul><li>在<strong>某些情况下</strong>Markdown标题不能渲染（<code>hexo-reference-plus</code>也有同样的问题）</li><li>代码块中的脚注代码也会被渲染（Markdown又没有足够的转义符规则，<code>只能使用行内代码</code>回避这一问题）</li><li><strong>似乎</strong>代码块必须指定语言，否则代码块之后的内容无法正确渲染</li><li>脚注索引<strong>似乎</strong>不不支持脚注名（或许是我姿势不对）</li><li>脚注编号（页尾）上移，不知道是不是作者有意为之</li></ul><h2 id="Markdown2WebPage"><a href="#Markdown2WebPage" class="headerlink" title="Markdown2WebPage"></a>Markdown2WebPage</h2><p>用别人的框架果然还是麻烦，更想写自己的静态页面生成器了doge。</p><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">这是一条插入的脚注<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/kchen0x/hexo-reference<a href="#fnref:2" rev="footnote"> ↩</a></span></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">3.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/maxchang3/hexo-reference-plus<a href="#fnref:3" rev="footnote"> ↩</a></span></li><li id="fn:4"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">4.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/hexojs/hexo-renderer-markdown-it<a href="#fnref:4" rev="footnote"> ↩</a></span></li></ol></div></div>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;在Hexo博文中添加脚注需要两个条件， 分别是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;支持脚注（当然还有更多拓展格式和功能，比如表格，比如更好地和HTML、LaTeX等格式互转。这里我们只关心脚注）的Mardown（Multi-Markdown， MMD）&lt;/li&gt;
+&lt;li&gt;支持MMD的渲染器（Hexo插件）&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Web" scheme="https://hilinxinhui.github.io/categories/Dev/Web/"/>
+    
+    
+    <category term="hexo" scheme="https://hilinxinhui.github.io/tags/hexo/"/>
+    
+    <category term="footnote" scheme="https://hilinxinhui.github.io/tags/footnote/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在博客文章中插入图片和使用图床</title>
+    <link href="https://hilinxinhui.github.io/2023/07/13/%E5%9C%A8%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87%E5%92%8C%E4%BD%BF%E7%94%A8%E5%9B%BE%E5%BA%8A/"/>
+    <id>https://hilinxinhui.github.io/2023/07/13/%E5%9C%A8%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87%E5%92%8C%E4%BD%BF%E7%94%A8%E5%9B%BE%E5%BA%8A/</id>
+    <published>2023-07-13T14:40:15.000Z</published>
+    <updated>2024-05-20T11:49:34.030Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本文第一部分介绍在Hexo中增加资源目录并在博文中插入图片的方法。显然这种方法只适合于Hexo，所以本文第二部分介绍通过图床（在理论上任何地方）插入图片的方法。</p><p>什么是图床？不严格地解释，图床就是存放图片的服务器，将图片上传到某个图床服务商的服务器，获取可访问（可公网访问？不知道这样的描述对不对）的图片url的过程就是使用图床的过程。搭建图床的过程十分简单，理论上一台可公网访问的服务器即可。本文第二部分介绍介绍以GitHub（服务器）作为图床服务器的方法，配合<a href="https://github.com/Molunerfinn/PicGo">PicGo</a>搭建图床。PicGo用户指南请看<a href="https://picgo.github.io/PicGo-Doc/zh/guide/">这里</a>。</p><span id="more"></span><h2 id="在Hexo博客中插入图片"><a href="#在Hexo博客中插入图片" class="headerlink" title="在Hexo博客中插入图片"></a>在Hexo博客中插入图片</h2><p>第一种情形&#x2F;方法，诸如<code>about</code>页面中的图片，在<code>source</code>目录下新建<code>image</code>目录（其实起什么名字都行）存要插入的图片，在对应页面（在这里的例子里是<code>about.html</code>）中通过相对路径插入图片即可。</p><p>第二种情形&#x2F;方法，一般的<code>post</code>博文中的图片，修改<code>_config.yml</code>文件中<code>post_asset_folder</code>字段为<code>true</code>，以后新建博文（指markdown文件）时会自动生成名字同名目录用于存放需要插入的图片资源文件，将要插入的图片保存在对应目录下，在博文markdown文件中引用对应图片即可，注意以下两个小问题：</p><ul><li>安装<code>hexo-renderer-marked</code>插件，否则只能以<code>&#123;%asset_image <image_name> <description> %&#125;</code>的形式插入图片</li><li>引用图片时只需要包含图片名称，图片资源文件的url是由上一条注意事项中的插件自动生成的</li><li>对在进行上述设置前新建的博客文件，手动创建同名资源文件夹即可</li></ul><h2 id="搭建图床"><a href="#搭建图床" class="headerlink" title="搭建图床"></a>搭建图床</h2><ul><li>注册GitHub账号</li><li>新建图床仓库（设置为<code>Public</code>）</li><li>生成token(用<code>Tokens(classic)</code>，勾选<code>repo</code>权限即可)</li><li>安装PicGo客户端，填入各种信息</li><li>上传图片</li><li><a href="#%E5%9B%BE%E5%BA%8A%E6%B5%8B%E8%AF%95">使用图床</a></li></ul><h2 id="图床测试"><a href="#图床测试" class="headerlink" title="图床测试"></a>图床测试</h2><p>如图是PicGo的GitHub设置示意图，填写：</p><ul><li>图床仓库名</li><li>上传到图床仓库的哪一个分支</li><li>token</li><li>存储路径和自定义域名（非必须，我设置了存储路径）</li></ul><p><img src="https://raw.githubusercontent.com/hilinxinhui/image_host_github/main/images/picgo_github_setting.png" alt="PicGoGitHub设置示意"></p><p>和直接上传图片没有很大区别。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;本文第一部分介绍在Hexo中增加资源目录并在博文中插入图片的方法。显然这种方法只适合于Hexo，所以本文第二部分介绍通过图床（在理论上任何地方）插入图片的方法。&lt;/p&gt;
+&lt;p&gt;什么是图床？不严格地解释，图床就是存放图片的服务器，将图片上传到某个图床服务商的服务器，获取可访问（可公网访问？不知道这样的描述对不对）的图片url的过程就是使用图床的过程。搭建图床的过程十分简单，理论上一台可公网访问的服务器即可。本文第二部分介绍介绍以GitHub（服务器）作为图床服务器的方法，配合&lt;a href=&quot;https://github.com/Molunerfinn/PicGo&quot;&gt;PicGo&lt;/a&gt;搭建图床。PicGo用户指南请看&lt;a href=&quot;https://picgo.github.io/PicGo-Doc/zh/guide/&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Web" scheme="https://hilinxinhui.github.io/categories/Dev/Web/"/>
+    
+    
+    <category term="hexo" scheme="https://hilinxinhui.github.io/tags/hexo/"/>
+    
+    <category term="GitHub" scheme="https://hilinxinhui.github.io/tags/GitHub/"/>
+    
+    <category term="image_host" scheme="https://hilinxinhui.github.io/tags/image-host/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Python虚拟环境和conda</title>
+    <link href="https://hilinxinhui.github.io/2023/07/10/Python%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E5%92%8Cconda/"/>
+    <id>https://hilinxinhui.github.io/2023/07/10/Python%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E5%92%8Cconda/</id>
+    <published>2023-07-10T11:58:08.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><blockquote><p>Conda is an open source package management system and environment management system for installing multiple versions of software packages and their dependencies and switching easily between them. It works on Linux, OS X and Windows, and was created for Python programs but can package and distribute any software.</p></blockquote><p>这里有几个早些时候录制的演示视频：</p><ul><li><a href="https://www.bilibili.com/video/BV1p44y1x7Tw">安装conda</a></li><li><a href="https://www.bilibili.com/video/BV1LY411t7sP">使用conda（上）</a></li><li><a href="https://www.bilibili.com/video/BV1Ku41127ko">使用conda（下）</a></li></ul><span id="more"></span><h2 id="conda"><a href="#conda" class="headerlink" title="conda"></a>conda</h2><p>很多情况下划分不同的Python虚拟环境是有必要的。Python提供了<code>venv</code>工具实现虚拟环境管理，这个工具很轻，但权限有限，且只能使用<code>pip</code>进行软件包管理。<code>conda</code>解决了<code>venv</code>的问题，是一个更强大的虚拟环境管理工具。</p><p>具体地，<code>miniconda</code>相比与<code>Anaconda</code>更轻量，下载和安装都更快。</p><h3 id="安装-mini-conda"><a href="#安装-mini-conda" class="headerlink" title="安装(mini)conda"></a>安装(mini)conda</h3><p>由于种种原因，访问<code>conda</code>官网通常不太顺利，作者一般用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学镜像站</a>替代。</p><p>在<a href="https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/">这里</a>可以看到<code>conda</code>镜像使用帮助，<a href="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/">这里</a>提供<code>miniconda</code>安装包&#x2F;脚本存档。</p><p>这篇文章写于2023年7月10日，此时能下载的最新的<code>miniconda</code>版本是<code>4.9.2</code>，以<code>Linux_x86_64</code>系统为例：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh <span class="comment"># 下载</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">bash Miniconda3-py39_4.9.2-Linux-x86_64.sh <span class="comment"># 安装，一般不需要sudo权限</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">依据提示接受条款、选择安装路径、写入环境变量（安装脚本自动完成，用户选择是/否即可）</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">source</span> ~/.bashrc <span class="comment"># 或新开一个终端窗口</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">默认在&lt;用户-主机-命令提示符&gt;这串东西前出现(base)字样，表示当前所处的虚拟环境</span></span><br></pre></td></tr></table></figure><p>个人习惯，一般不用base环境。</p><h3 id="常用的conda命令"><a href="#常用的conda命令" class="headerlink" title="常用的conda命令"></a>常用的conda命令</h3><p>使用conda的工作流可能像这样：</p><ul><li>创建环境和激活环境</li><li>安装各种需要的东西（以PyTorch为例）</li><li>查看所有</li><li>导出环境</li><li>依据导出的环境创建环境（导入环境）</li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看所有conda环境</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda <span class="built_in">env</span> list</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda info -e <span class="comment"># 请看茴香豆的另一种吃法</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda info --envs <span class="comment"># 请看茴香豆的再一种吃法</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建conda环境（更准确地说是Python虚拟环境），下面演示茴香豆的若干种吃法</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda create -n &lt;env_name&gt;</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda create -n &lt;env_name&gt; python=&lt;python_version&gt;</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda create -n py3.8 python=3.8 numpy pandas matplotlib <span class="comment"># 一个实际的例子</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装各种东西</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda activate py3.8</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia <span class="comment"># PyTorch为例</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">pip install <span class="comment"># “在conda里也可以用pip”</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装之前可以先搜索所有可用版本，再指定某一具体版本</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda uninstall numpy <span class="comment"># 以numpy为例，先卸载当前安装的版本</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda search numpy</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda install numpy=&lt;version_id&gt;=&lt;build_id&gt; <span class="comment"># build_id即子版本号，要注意version_id太小（安装古早版本的numpy可能导致依赖崩溃使得无法安装）</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">导出和导入</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda <span class="built_in">env</span> <span class="built_in">export</span> -n &lt;env_name&gt; &gt; &lt;export_file_name&gt;.yaml</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda <span class="built_in">env</span> create -f &lt;export_file_name&gt;.yaml <span class="comment"># 其实是创建一个新环境</span></span></span><br></pre></td></tr></table></figure><p>除了上述命令外，还有：</p><ul><li>查看conda版本：看这个干什么？</li><li>更新conda：用conda命令的时候会返回更新提示，照做就好</li><li>更新其他包（如numpy）：相信我你不会想更新的，如果需要用更新版本的包（如升级torch1.x到2.x），应该新开一个环境</li><li>换源：这个确实重要，看tuna的文档就行，顺便说一句，conda的配置写在<code>~/.condarc</code>文件中</li><li>查看当前环境中安装了哪些东西：<code>conda list</code>，通常后面接<code>grep</code>查看某个具体的包的信息</li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;Conda is an open source package management system and environment management system for installing multiple versions of software packages and their dependencies and switching easily between them. It works on Linux, OS X and Windows, and was created for Python programs but can package and distribute any software.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这里有几个早些时候录制的演示视频：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.bilibili.com/video/BV1p44y1x7Tw&quot;&gt;安装conda&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.bilibili.com/video/BV1LY411t7sP&quot;&gt;使用conda（上）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.bilibili.com/video/BV1Ku41127ko&quot;&gt;使用conda（下）&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Python" scheme="https://hilinxinhui.github.io/categories/Dev/Python/"/>
+    
+    
+    <category term="conda" scheme="https://hilinxinhui.github.io/tags/conda/"/>
+    
+    <category term="virtual environment" scheme="https://hilinxinhui.github.io/tags/virtual-environment/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Install Nvidia Driver on Ubuntu20.04</title>
+    <link href="https://hilinxinhui.github.io/2023/07/06/Install-Nvidia-Driver-on-Ubuntu20-04/"/>
+    <id>https://hilinxinhui.github.io/2023/07/06/Install-Nvidia-Driver-on-Ubuntu20-04/</id>
+    <published>2023-07-06T07:47:15.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>在Ubuntu 20.04上安装Nvidia显卡驱动。</p><ul><li>硬件平台：LEGION y7000p 2020</li><li>显卡型号：NVIDIA RTX 2060 6G（notebook）</li><li>驱动版本：535.54.03</li></ul><span id="more"></span><h2 id="安装驱动"><a href="#安装驱动" class="headerlink" title="安装驱动"></a>安装驱动</h2><p>在<a href="https://www.nvidia.cn/Download/index.aspx?lang=cn">这里</a>选择对应的驱动版本并下载。安装指引请看<a href="http://us.download.nvidia.cn/XFree86/Linux-x86_64/535.54.03/README/installdriver.html">这里</a>。</p><p>tl;dr:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">卸载原有驱动（若有）</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt remove --purge nvidia*</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">禁用nouveau</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo vim /etc/modprobe.d/blacklist.conf</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">填入 blacklist nouveau</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">填入 options nouveau modeset=0</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo update-initramfs -u <span class="comment"># 更新内核</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重启后验证nouveau已禁用</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">lsmod | grep nouveau</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">关闭图形化界面，这一步不是必须的</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo service lightdm stop</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ctrl + Alt + F3，因机而异</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装驱动</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo <span class="built_in">chmod</span> +x NVIDIA-Linux-x86_64-535.54.03.run <span class="comment"># 以此版本驱动为例</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo ./NVIDIA-Linux-x86_64-535.54.03.run <span class="comment"># 以此版本驱动为例</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">开启图形界面，同理，这一步不是必须的</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo service lightdm start</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ctrl + Alt + F2，因机而异</span></span><br></pre></td></tr></table></figure><p>安装过程遵照提示，作者遇到了以下两个问题：</p><ul><li>需要<code>sudo</code>权限执行安装脚本</li><li>需要安装<code>make</code>进行编译</li></ul><p>按照错误信息重新执行&#x2F;安装需要的东西即可。</p><h2 id="验证驱动安装情况"><a href="#验证驱动安装情况" class="headerlink" title="验证驱动安装情况"></a>验证驱动安装情况</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">nvidia-smi</span></span><br></pre></td></tr></table></figure><p>命令返回：</p><ul><li>驱动版本信息、兼容的cuda版本信息</li><li>显卡型号、显存使用情况和正在使用显卡的进程</li></ul><p><img src="/2023/07/06/Install-Nvidia-Driver-on-Ubuntu20-04/nvidia_smi.png" alt="nvidia_smi"></p><h2 id="cuda和cudnn"><a href="#cuda和cudnn" class="headerlink" title="cuda和cudnn"></a>cuda和cudnn</h2><p>作者一般用conda安装cudatoolkit（或cuda-runtime一类的东西）和cudnn（更方便版本管理）。安装命令看起来像这样（版本可能不一样）：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia</span></span><br></pre></td></tr></table></figure><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(torch.cuda.is_available()) <span class="comment"># True</span></span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;在Ubuntu 20.04上安装Nvidia显卡驱动。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;硬件平台：LEGION y7000p 2020&lt;/li&gt;
+&lt;li&gt;显卡型号：NVIDIA RTX 2060 6G（notebook）&lt;/li&gt;
+&lt;li&gt;驱动版本：535.54.03&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="DL" scheme="https://hilinxinhui.github.io/categories/Dev/DL/"/>
+    
+    
+    <category term="NVIDIA" scheme="https://hilinxinhui.github.io/tags/NVIDIA/"/>
+    
+    <category term="Ubuntu" scheme="https://hilinxinhui.github.io/tags/Ubuntu/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>commit message 规范化实践</title>
+    <link href="https://hilinxinhui.github.io/2023/06/23/commit-message-%E8%A7%84%E8%8C%83%E5%8C%96%E5%AE%9E%E8%B7%B5/"/>
+    <id>https://hilinxinhui.github.io/2023/06/23/commit-message-%E8%A7%84%E8%8C%83%E5%8C%96%E5%AE%9E%E8%B7%B5/</id>
+    <published>2023-06-23T08:21:06.000Z</published>
+    <updated>2024-05-20T11:49:34.018Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>Commitizen和git commit message规范化实践。</p><p>按照惯例这里有一篇与git相关的文章。git的提交信息很重要，尤其在多人协作开发大型软件的场景下。本文介绍完整的git commit message应该包括哪些信息，以及如何省心省力地书写这些信息。</p><span id="more"></span><h2 id="git-commit-message"><a href="#git-commit-message" class="headerlink" title="git commit message"></a>git commit message</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">一行commit message足矣</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git commit -m <span class="string">&quot;&lt;commit message&gt;&quot;</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果需要写多行commit message</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git commit <span class="comment"># 进入文本编辑器写更详细的提交信息</span></span></span><br></pre></td></tr></table></figure><p>commit message的写法就像变量的命名方法，应力求简洁准确，清晰明了。具体的commit message格式有不同标准，这里采用<a href="https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.greljkmo14y0">Angular规范</a></p><p>一种简单淳朴的方式是手工创建一个纯文本文件<code>.git_commit_message_template</code>，在这个文件中填写希望每次提交时需要提供的信息，修改<code>~/.gitconfig</code>文件，在其中加上：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[commit]</span><br><span class="line">template = ~/.git_commit_message_template</span><br></pre></td></tr></table></figure><p>这样每次使用<code>git commit</code>唤起文本编辑器时，<code>.git_commit_message_template</code>中的内容会以注释的形式出现在编辑器中作为hints。</p><p>这样的方式或许过于简单淳朴，十分懒人不友好。幸运的是，可以通过<a href="https://github.com/commitizen/cz-cli">Commitizen</a>工具实现一定程度的自动化。</p><h2 id="AngularJS-Git-Commit-Message-Conventions"><a href="#AngularJS-Git-Commit-Message-Conventions" class="headerlink" title="AngularJS Git Commit Message Conventions"></a>AngularJS Git Commit Message Conventions</h2><p>Angular规范规定的commit message包括三个部分：</p><ul><li>Header：说明提交类别、提交的影响范围和提交的目的</li><li>Body：对本次提交的详细描述</li><li>Footer：产生不兼容变动或关闭issue时写</li></ul><p>具体写法可参考<a href="https://ruanyifeng.com/blog/2016/01/commit_message_change_log.html">这里</a>。</p><h2 id="Commitizen"><a href="#Commitizen" class="headerlink" title="Commitizen"></a>Commitizen</h2><p>安装Commitizen需要<code>npm</code>，作者推荐使用<code>nvm</code>管理node版本。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install -g commitizen</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">切换到项目目录下</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">commitizen init cz-conventional-changelog --save --save-exact</span></span><br></pre></td></tr></table></figure><p>注意安装好后可能要修改<code>.gitignore</code>文件。</p><p>此后提交操作的命令由<code>git commit</code>变为<code>git cz</code>。</p><h2 id="本文参考了以下内容"><a href="#本文参考了以下内容" class="headerlink" title="本文参考了以下内容"></a>本文参考了以下内容</h2><ul><li><a href="https://www.zhihu.com/question/21209619/answer/257574960">如何写好 Git commit log?</a></li><li><a href="https://ruanyifeng.com/blog/2016/01/commit_message_change_log.html">Commit message 和 Change log 编写指南</a></li><li><a href="https://commitizen-tools.github.io/commitizen/">Commitizen</a></li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;Commitizen和git commit message规范化实践。&lt;/p&gt;
+&lt;p&gt;按照惯例这里有一篇与git相关的文章。git的提交信息很重要，尤其在多人协作开发大型软件的场景下。本文介绍完整的git commit message应该包括哪些信息，以及如何省心省力地书写这些信息。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="VCS" scheme="https://hilinxinhui.github.io/categories/Dev/VCS/"/>
+    
+    
+    <category term="git" scheme="https://hilinxinhui.github.io/tags/git/"/>
+    
+    <category term="Commitizen" scheme="https://hilinxinhui.github.io/tags/Commitizen/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hexo categories &amp; tags</title>
+    <link href="https://hilinxinhui.github.io/2023/06/21/Hexo-categories-tags/"/>
+    <id>https://hilinxinhui.github.io/2023/06/21/Hexo-categories-tags/</id>
+    <published>2023-06-21T05:14:27.000Z</published>
+    <updated>2024-05-20T11:49:34.014Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><ul><li>分类（categories）：有层次结构</li><li>标签（tags）：无层次结构</li></ul><p>在Hexo blog中添加分类和标签（通常是多分类和多标签）。Hexo关于front-matter的<a href="https://hexo.io/docs/front-matter.html">说明</a>中介绍了如何指定分类和标签。</p><span id="more"></span><h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><p>文章的分类有层次结构。最简单的情形是文章只有一个分类，直接这样写：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">categories: category1</span><br></pre></td></tr></table></figure><p>当有多个分类时需要考虑分类间的层次，以下例子中，category2是category1的子分类：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line"><span class="bullet">    -</span> [category1, category2]</span><br></pre></td></tr></table></figure><p>以下例子中，category2还是category1的子分类：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line"><span class="bullet">    -</span> category1</span><br><span class="line"><span class="bullet">    -</span> category2</span><br></pre></td></tr></table></figure><p>以下例子中的三个分类属于同一个层次：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line"><span class="bullet">    -</span> [category1]</span><br><span class="line"><span class="bullet">    -</span> [category2]</span><br><span class="line"><span class="bullet">    -</span> [category3]</span><br></pre></td></tr></table></figure><p>以下例子中，文章被分类到category1、category2和<strong>category1的子分类category3</strong>中:</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line"><span class="bullet">    -</span> [category1]</span><br><span class="line"><span class="bullet">    -</span> [category2]</span><br><span class="line"><span class="bullet">    -</span> [category1, category3]</span><br></pre></td></tr></table></figure><h2 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h2><p>文章的标签没有层次结构。使得标签的写法非常简单，可以这样：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tags:</span><br><span class="line"><span class="bullet">    -</span> tag1</span><br><span class="line"><span class="bullet">    -</span> tag2</span><br><span class="line"><span class="bullet">    -</span> tag3</span><br></pre></td></tr></table></figure><p>也可以这样：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tags: [tag1, tag2, tag3]</span><br></pre></td></tr></table></figure><p>一般认为第二种方式更直观。</p><h2 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h2><p>以本文为例，写起来像这样：</p><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line"><span class="bullet">    -</span> [Dev, Web]</span><br><span class="line"><span class="bullet">    -</span> [Category<span class="emphasis">_test]</span></span><br><span class="line"><span class="emphasis">tags: [hexo, tag_</span>test]</span><br></pre></td></tr></table></figure><p>看起来像这样：</p><p><img src="/2023/06/21/Hexo-categories-tags/categories_and_tags_demo.png" alt="categories_and_tags_demo"></p>]]></content>
+    
+    
+    <summary type="html">&lt;ul&gt;
+&lt;li&gt;分类（categories）：有层次结构&lt;/li&gt;
+&lt;li&gt;标签（tags）：无层次结构&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在Hexo blog中添加分类和标签（通常是多分类和多标签）。Hexo关于front-matter的&lt;a href=&quot;https://hexo.io/docs/front-matter.html&quot;&gt;说明&lt;/a&gt;中介绍了如何指定分类和标签。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Web" scheme="https://hilinxinhui.github.io/categories/Dev/Web/"/>
+    
+    <category term="Category_test" scheme="https://hilinxinhui.github.io/categories/Category-test/"/>
+    
+    
+    <category term="hexo" scheme="https://hilinxinhui.github.io/tags/hexo/"/>
+    
+    <category term="tag_test" scheme="https://hilinxinhui.github.io/tags/tag-test/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何搭建个人博客</title>
+    <link href="https://hilinxinhui.github.io/2023/06/20/%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/"/>
+    <id>https://hilinxinhui.github.io/2023/06/20/%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</id>
+    <published>2023-06-20T08:18:36.000Z</published>
+    <updated>2024-05-20T11:49:34.030Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>使用Hexo、GitHub Pages和GitHub Actions搭建个人博客。</p><blockquote><p>Hexo是一个快速、简洁且高效的博客框架。Hexo 使用Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。GitHub Pages是一个静态站点托管服务，旨在直接从GitHub仓库中直接托管个人、组织或项目页面。GitHub Actions是一种持续集成和持续交付 (CI&#x2F;CD) 平台，可用于自动执行生成、测试和部署管道。用户可以创建工作流程来构建和测试存储库的每个拉取请求，或将合并的拉取请求部署到生产环境。</p></blockquote><span id="more"></span><h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><p><a href="https://hexo.io/zh-cn/index.html">Hexo</a>是一个<strong>开源</strong>（源码地址见<a href="https://github.com/hexojs/hexo">Hexo on GitHub</a>）的“快速、简洁且高效的博客框架”。</p><p>Hexo基于node.js，安装Hexo需要使用npm。作者建议使用nvm管理node环境以避免不必要的麻烦。对于Linux或MacOS用户，可以<a href="https://github.com/nvm-sh/nvm">这样</a>安装nvm；Windows用户请移步<a href="https://github.com/coreybutler/nvm-windows">nvm for Windows</a>（当然也可以借助wsl或docker）。</p><p>安装的过程<strong>看起来像这样</strong>（仅作示范）：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">从安装nvm说起？</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash <span class="comment"># 或者用wget，无法访问raw.githubusercontent.com可以换gitee上的这个：https://gitee.com/RubyKids/nvm-cn（但是作者并不知道是否能保持更新）</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">你可能需要重启终端或者<span class="built_in">source</span>点什么东西</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">nvm install --lts <span class="comment"># 此时的lts指向18.06.0</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Windows下需要手动指定使用的node版本，其他平台貌似不需要，至此已经准备好node和npm了</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">假设博文内容存放在blog_hexo目录下</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">mkdir</span> blog_hexo &amp;&amp; <span class="built_in">cd</span> blog_hexo</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-cli -g</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo init ./</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">差不多完成了，看看效果</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo g <span class="comment"># generate</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo s <span class="comment"># server，访问https://localhost:4000即可看到效果</span></span></span><br></pre></td></tr></table></figure><p>现在的网站非常简陋，更重要的是，网站的所有信息（包括标题、子标题、作者）都没有设置。这时候需要修改<code>blog_hexi/_config.yml</code>中的对应值，具体字段的含义请看<a href="https://hexo.io/zh-cn/docs/configuration">这里</a>。</p><p>现在我们可以开始专注于写作了，博客内容以Markdown文件的形式呈现，写一篇博客的过程<strong>看起来像这样</strong>（仅作示范*2），具体指令的含义请看<a href="https://hexo.io/zh-cn/docs/writing">这里</a>：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo clean <span class="comment"># 清除缓存文件和已生成的静态文件</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo new <span class="string">&quot;如何搭建个人博客&quot;</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">working really hard on writing...</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo g <span class="comment"># hexo generate</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo s <span class="comment"># hexo server，访问https://localhost:4000检查一下效果</span></span></span><br></pre></td></tr></table></figure><p>或许你想和用git管理<code>blog_hexo</code>目录，请注意先执行<code>hexo init ./</code>，再执行<code>git init ./</code>；若要把这个仓库同步到诸如GitHub或Gitee这样的git服务器上，注意设置仓库的可访问性以避免token&#x2F;SSH key等内容泄露。</p><p>Hexo的<a href="https://hexo.io/zh-cn/docs/">文档</a>非常详细，可读性也很好，要更进一步地了解Hexo可以先从文档看起。</p><h2 id="GitHub-Pages"><a href="#GitHub-Pages" class="headerlink" title="GitHub Pages"></a>GitHub Pages</h2><p>作者两年前买了一个.com域名，现在快续不起费了qaq，还是先用<a href="hilinxinhui.github.io">GitHub Pages</a>。</p><p>hexo官方的关于部署过程的<a href="https://hexo.io/zh-cn/docs/github-pages">文档</a>杂糅了GitHub Pages和GitHub Actions的操作，参考这个一键部署<a href="https://hexo.io/zh-cn/docs/one-command-deployment">文档</a>更合适一些。</p><p>在使用GitHub Pages之前，显然要先知道什么是git和什么是GitHub，这两部分内容都不是本文的重点，如有需要请参考<a href="https://github.com/hilinxinhui/AMazeLab_git_tutorial">这个文档</a>。使用GitHub Pages和Hexo部署个人博客的过程分为三步：</p><h3 id="建仓库，配置SSH-key"><a href="#建仓库，配置SSH-key" class="headerlink" title="建仓库，配置SSH key"></a>建仓库，配置SSH key</h3><p>仓库名为<code>&lt;username&gt;.github.io</code>。</p><p>配置SSH key，将公钥保存到GitHub上，如有需要请参考<a href="https://git-scm.com/book/zh/v2/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-Git-%E7%94%9F%E6%88%90-SSH-%E5%85%AC%E9%92%A5">这里</a>。</p><h3 id="改配置"><a href="#改配置" class="headerlink" title="改配置"></a>改配置</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> blog_hexo</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-deployer-git --save</span></span><br></pre></td></tr></table></figure><p>修改<code>blog_hexo/_config.yml</code>文件，看起来像这样：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">## Docs: https://hexo.io/docs/one-command-deployment</span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repository: git@github.com:hilinxinhui/hilinxinhui.github.io.git</span><br><span class="line">  branch: main</span><br></pre></td></tr></table></figure><h3 id="一键部署"><a href="#一键部署" class="headerlink" title="一键部署"></a>一键部署</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo d <span class="comment"># hexo deploy</span></span></span><br></pre></td></tr></table></figure><p>具体实现方式见<a href="https://hexo.io/zh-cn/docs/one-command-deployment">文档</a>。</p><h2 id="GitHub-Actions"><a href="#GitHub-Actions" class="headerlink" title="GitHub Actions"></a>GitHub Actions</h2><p>这一步或许不是必须的，尤其当你不使用git管理博客内容的时候（更准确地说是不管理blog_hexo这个目录时）。</p><p>GitHub Actions实现了以下工作流：</p><ul><li>在<code>blog_hexo</code>目录下完成写博客</li><li>git add &amp; git commit &amp; git push</li><li>自动完成站点部署</li></ul><p>使用GitHub Actions部署站点，理论上本地不再需要安装node、hexo等环境。使用GitHub Actions部署站点，GitHub上有两个仓库，一个是<code>blog_hexo</code>仓库，设置为<code>Private</code>（避免泄露各种密钥），一个是<code>&lt;username&gt;.github.io</code>，显然设置为<code>Public</code>（这样才能正常访问站点）。配置GitHub Actions还是分三步：</p><h3 id="配置密钥"><a href="#配置密钥" class="headerlink" title="配置密钥"></a>配置密钥</h3><p>生成SSH key，和上文已经描述过的过程一样。</p><p><code>&lt;username&gt;.github.io</code>仓库下<code>Settings</code>中<code>Deploy keys</code>保存公钥。</p><p><code>blog_hexo</code>仓库下<code>Settings</code>中<code>Secrets and variables</code>下<code>Actions</code>保存私钥。</p><p>请记住这里公钥和私钥的名字，配置文件中要用到。</p><h3 id="创建工作流"><a href="#创建工作流" class="headerlink" title="创建工作流"></a>创建工作流</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> blog_hexo/.github <span class="comment"># 没有.github目录请自行新建</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">mkdir</span> workflows &amp;&amp; <span class="built_in">cd</span> workflows</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">touch</span> auto_deploy.yml <span class="comment"># 文件名可自定</span></span></span><br></pre></td></tr></table></figure><p>修改<code>auto_deploy.yml</code>的内容定义GitHub Actions工作流，以下给出作者的配置，供参考：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">name: Hexo Deploy</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - main</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  build:</span><br><span class="line">    runs-on: ubuntu-20.04</span><br><span class="line">    if: github.event.repository.owner.id == github.event.sender.id</span><br><span class="line"></span><br><span class="line">    steps:</span><br><span class="line">      - name: Checkout source</span><br><span class="line">        uses: actions/checkout@v2</span><br><span class="line">        with:</span><br><span class="line">          ref: main</span><br><span class="line"></span><br><span class="line">      - name: Setup Node.js</span><br><span class="line">        uses: actions/setup-node@v1</span><br><span class="line">        with:</span><br><span class="line">          node-version: &#x27;18&#x27;</span><br><span class="line"></span><br><span class="line">      - name: Setup Hexo</span><br><span class="line">        env:</span><br><span class="line">          ACTION_DEPLOY_KEY: $&#123;&#123; secrets.HEXO_DEPLOY_KEY &#125;&#125;</span><br><span class="line">        run: |</span><br><span class="line">          mkdir -p ~/.ssh/</span><br><span class="line">          echo &quot;$ACTION_DEPLOY_KEY&quot; &gt; ~/.ssh/id_rsa</span><br><span class="line">          chmod 700 ~/.ssh</span><br><span class="line">          chmod 600 ~/.ssh/id_rsa</span><br><span class="line">          ssh-keyscan github.com &gt;&gt; ~/.ssh/known_hosts</span><br><span class="line">          git config --global user.email &quot;hilinxinhui@gmail.com&quot;</span><br><span class="line">          git config --global user.name &quot;hilinxinhui&quot;</span><br><span class="line">          git config --global init.defaultBranch main</span><br><span class="line">          npm install hexo-cli -g</span><br><span class="line">          npm isntall hexo-deployer-git --save</span><br><span class="line">          npm install</span><br><span class="line"></span><br><span class="line">      - name: Deploy</span><br><span class="line">        run: |</span><br><span class="line">          hexo clean</span><br><span class="line">          hexo g</span><br><span class="line">          git config --global user.email &quot;hilinxinhui@gmail.com&quot;</span><br><span class="line">          git config --global user.name &quot;hilinxinhui&quot;</span><br><span class="line">          hexo deploy</span><br></pre></td></tr></table></figure><p>网上不乏更加详细的配置过程记录和原理讲解文档，如<a href="https://zhuanlan.zhihu.com/p/170563000">这个</a>和<a href="https://zhuanlan.zhihu.com/p/137867759">这个</a>，供参考。</p><h3 id="推送和自动部署"><a href="#推送和自动部署" class="headerlink" title="推送和自动部署"></a>推送和自动部署</h3><p>完成上述配置后将本地仓库push到远程服务器即可完成自动化部署。</p><h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="主题和美化"><a href="#主题和美化" class="headerlink" title="主题和美化"></a>主题和美化</h3><p>这是一个完全主观环节，作者偏向使用简洁简单的主题，即使要在功能上妥协。</p><p>于是，本站使用<a href="https://github.com/kaedea/hexo-theme-hacker">hexo-theme-hacker</a>主题，这一主题修改自<a href="https://github.com/CodeDaraW/Hacker">Hacker</a>主题。</p><p><a href="https://github.com/probberechts/hexo-theme-cactus">hexo-theme-cactus</a>、<a href="https://github.com/KevinOfNeu/hexo-theme-xoxo">hexo-theme-xoxo</a>和<a href="https://github.com/frostfan/hexo-theme-polarbear">hexo-theme-polarbear</a>也是作者很喜欢的风格。</p><h3 id="首页折叠内容"><a href="#首页折叠内容" class="headerlink" title="首页折叠内容"></a>首页折叠内容</h3><p>用<code>&lt;!-- more --&gt;</code>标签划分想在首页显示的内容和不想在首页显示的内容。注意这种方法可能和使用的主题相关，请先参考具体使用的主题的说明文档。</p><h3 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h3><p>诸如如何开启评论区、启用Google分析、设置文章标签等问题一般在使用的主题的文档中有说明，以Hacker为例，在<a href="https://github.com/CodeDaraW/Hacker/blob/9c5801ed32cbf074a3f4bacd80a1bd193d12e2d8/README_zh-CN.md">这里</a>。有时使用的主题过于小众或想开（mo）发（gai）自己的主题，没有足够的文档资源可用，可以参考被广泛使用的主题的说明文档，如<a href="https://butterfly.js.org/">butterfly</a>，毕竟原理都是相通的。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;使用Hexo、GitHub Pages和GitHub Actions搭建个人博客。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Hexo是一个快速、简洁且高效的博客框架。Hexo 使用Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。GitHub Pages是一个静态站点托管服务，旨在直接从GitHub仓库中直接托管个人、组织或项目页面。GitHub Actions是一种持续集成和持续交付 (CI&amp;#x2F;CD) 平台，可用于自动执行生成、测试和部署管道。用户可以创建工作流程来构建和测试存储库的每个拉取请求，或将合并的拉取请求部署到生产环境。&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="Dev" scheme="https://hilinxinhui.github.io/categories/Dev/"/>
+    
+    <category term="Web" scheme="https://hilinxinhui.github.io/categories/Dev/Web/"/>
+    
+    
+    <category term="hexo" scheme="https://hilinxinhui.github.io/tags/hexo/"/>
+    
+    <category term="git" scheme="https://hilinxinhui.github.io/tags/git/"/>
+    
+    <category term="CI/CD" scheme="https://hilinxinhui.github.io/tags/CI-CD/"/>
+    
+  </entry>
+  
+</feed>

@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>unraid OS boot device bug report | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="事情的背景是这样，考虑到TrueNAS对内存要求太高了，作者兴冲冲准备体验unraid。制作好启动盘后（截止至2023.8.16，试用最新版系统Unraid 6.12.3）准备安装unraid时，进入主机引导菜单能够识别unraid引导u盘，但选择启动设备后没有进入安装流程，而是反复重新进入boot menu（select boot device）。">
+  
+
+  
+  
+  <meta name="keywords" content="UNRAID,boot_device">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="unraid OS boot device bug report"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>unraid OS boot device bug report</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/08/17/unraid-OS-boot-device-bug-report/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-08-17T13:06:11.000Z">
+          2023-08-17
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5"><span class="toc-text">问题排查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">解决方案</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>事情的背景是这样，考虑到TrueNAS对内存要求太高了，作者兴冲冲准备体验unraid。制作好启动盘后（截止至2023.8.16，试用最新版系统Unraid 6.12.3）准备安装unraid时，进入主机引导菜单能够识别unraid引导u盘，但选择启动设备后没有进入安装流程，而是反复重新进入boot menu（select boot device）。</p>
+<span id="more"></span>
+
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这个问题作者以前从来没有见识过，本能地进行如下排查：</p>
+<ul>
+<li>BIOS设置，包括：<ul>
+<li>两个虚拟化选项</li>
+<li>FastBoot</li>
+<li>SecureBoot</li>
+</ul>
+</li>
+<li>boot USB，包括<ul>
+<li>GUID状态（鉴于成功制作了安装盘应该不会有问题）</li>
+<li>主板接口位置，从机箱前面板USB接口（USB2.0）换到了主板背板USB接口（USB2.0&amp;USB3.0）</li>
+<li>贴吧有人说最好用USB2.0U盘制作启动盘，作者认为纯属扯淡</li>
+</ul>
+</li>
+<li>铭瑄主板对unraid OS的兼容性</li>
+<li>换设备重新制作启动盘</li>
+<li>换不同版本的unraid OS（只测试了前一个版本）</li>
+<li>校验下载的unraid OS压缩包完整性</li>
+</ul>
+<p>（以上排查内容没有先后顺序，想到啥做啥）</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>这个问题过于无厘头作者甚至不知道怎么描述，最后在贴吧里找到了一样的问题：unraid无法进入系统，无限进入BIOS，吧友“auick”的回答醍醐灌顶：</p>
+<p>看看U盘根目录是不是有个“EFI-”，如果是，去掉最后横杠，改为 EFI</p>
+<p><img src="/2023/08/17/unraid-OS-boot-device-bug-report/issue.png" alt="issue"></p>
+<p><img src="/2023/08/17/unraid-OS-boot-device-bug-report/solution.png" alt="solution"></p>
+<p>修改后成功启动。作者自信这几年装了各种各样奇怪的系统应该，操作应该符合标准流程，为什么启动盘会出现这种问题且几乎没有用户反馈这两件事完全超出了作者的认知。</p>
+<p>作者最终还是选择了TrueNAS作为主力NAS系统，倒是和上面描述的bug没啥关系，主要原因是找到了合适的支持ECC内存的板U:）。</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/NAS/">NAS</a>, <a href="/categories/NAS/UNRAID/">UNRAID</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/UNRAID/">UNRAID</a><a href="/tags/boot-device/">boot_device</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>

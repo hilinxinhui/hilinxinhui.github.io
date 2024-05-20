@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Install Nvidia Driver on Ubuntu20.04 | hilinxinhui</title>
+
+  
+  <meta name="author" content="Xinhui Lin">
+  
+
+  
+  <meta name="description" content="在Ubuntu 20.04上安装Nvidia显卡驱动。
+
+硬件平台：LEGION y7000p 2020
+显卡型号：NVIDIA RTX 2060 6G（notebook）
+驱动版本：535.54.03">
+  
+
+  
+  
+  <meta name="keywords" content="NVIDIA,Ubuntu">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Install Nvidia Driver on Ubuntu20.04"/>
+
+  <meta property="og:site_name" content="hilinxinhui"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="hilinxinhui" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  
+  <link href="https://fonts.lug.ustc.edu.cn/css?family=Lato|Rubik" rel="stylesheet">
+  <script src="/js/pangu-407.min.js"></script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    pangu.autoSpacingPage();
+  });
+</script>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">hilinxinhui</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+        <li><a href="/">主页</a></li>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+        <li><a href="/atom.xml">订阅</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Install Nvidia Driver on Ubuntu20.04</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2023/07/06/Install-Nvidia-Driver-on-Ubuntu20-04/" rel="bookmark">
+        <time class="entry-date published" datetime="2023-07-06T07:47:15.000Z">
+          2023-07-06
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        
+
+<script type="text/javascript">
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    window.onscroll = function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > convertRemToPixels(40)) {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'visible';
+        } else {
+            document.getElementsByClassName('toc-article')[0].style.visibility = 'hidden';
+        }
+    }
+</script>
+
+
+<div id="toc" class="toc-article">
+      <div class="toc-content">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E9%A9%B1%E5%8A%A8"><span class="toc-text">安装驱动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85%E6%83%85%E5%86%B5"><span class="toc-text">验证驱动安装情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cuda%E5%92%8Ccudnn"><span class="toc-text">cuda和cudnn</span></a></li></ol>
+      </div>
+</div>
+<style>
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>在Ubuntu 20.04上安装Nvidia显卡驱动。</p>
+<ul>
+<li>硬件平台：LEGION y7000p 2020</li>
+<li>显卡型号：NVIDIA RTX 2060 6G（notebook）</li>
+<li>驱动版本：535.54.03</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="安装驱动"><a href="#安装驱动" class="headerlink" title="安装驱动"></a>安装驱动</h2><p>在<a target="_blank" rel="noopener" href="https://www.nvidia.cn/Download/index.aspx?lang=cn">这里</a>选择对应的驱动版本并下载。安装指引请看<a target="_blank" rel="noopener" href="http://us.download.nvidia.cn/XFree86/Linux-x86_64/535.54.03/README/installdriver.html">这里</a>。</p>
+<p>tl;dr:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">卸载原有驱动（若有）</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt remove --purge nvidia*</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">禁用nouveau</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo vim /etc/modprobe.d/blacklist.conf</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">填入 blacklist nouveau</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">填入 options nouveau modeset=0</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo update-initramfs -u <span class="comment"># 更新内核</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重启后验证nouveau已禁用</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">lsmod | grep nouveau</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">关闭图形化界面，这一步不是必须的</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo service lightdm stop</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ctrl + Alt + F3，因机而异</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装驱动</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo <span class="built_in">chmod</span> +x NVIDIA-Linux-x86_64-535.54.03.run <span class="comment"># 以此版本驱动为例</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo ./NVIDIA-Linux-x86_64-535.54.03.run <span class="comment"># 以此版本驱动为例</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">开启图形界面，同理，这一步不是必须的</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo service lightdm start</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ctrl + Alt + F2，因机而异</span></span><br></pre></td></tr></table></figure>
+
+<p>安装过程遵照提示，作者遇到了以下两个问题：</p>
+<ul>
+<li>需要<code>sudo</code>权限执行安装脚本</li>
+<li>需要安装<code>make</code>进行编译</li>
+</ul>
+<p>按照错误信息重新执行&#x2F;安装需要的东西即可。</p>
+<h2 id="验证驱动安装情况"><a href="#验证驱动安装情况" class="headerlink" title="验证驱动安装情况"></a>验证驱动安装情况</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">nvidia-smi</span></span><br></pre></td></tr></table></figure>
+
+<p>命令返回：</p>
+<ul>
+<li>驱动版本信息、兼容的cuda版本信息</li>
+<li>显卡型号、显存使用情况和正在使用显卡的进程</li>
+</ul>
+<p><img src="/2023/07/06/Install-Nvidia-Driver-on-Ubuntu20-04/nvidia_smi.png" alt="nvidia_smi"></p>
+<h2 id="cuda和cudnn"><a href="#cuda和cudnn" class="headerlink" title="cuda和cudnn"></a>cuda和cudnn</h2><p>作者一般用conda安装cudatoolkit（或cuda-runtime一类的东西）和cudnn（更方便版本管理）。安装命令看起来像这样（版本可能不一样）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(torch.cuda.is_available()) <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+      
+
+    <span class="post-categories">
+      <i class="icon-categories"></i>
+        <a href="/categories/Dev/">Dev</a>, <a href="/categories/Dev/DL/">DL</a>
+    </span>
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/NVIDIA/">NVIDIA</a><a href="/tags/Ubuntu/">Ubuntu</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Deployed by <a href="https://github.com/kaedea/notion-down" target="_blank">notion-down</a> and
+    Theme by <a href="https://github.com/kaedea/hexo-theme-hacker" target="_blank">hexo-theme-hacker</a>
+    </br>
+    
+    &copy; 2024 Xinhui Lin
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-J38N5N288S', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+  </div>
+</div>
+</body>
+</html>
